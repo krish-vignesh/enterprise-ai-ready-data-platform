@@ -1,0 +1,6 @@
+{
+  "name": "Enterprise AI-Ready Data Platform",
+  "description": "An interactive prototype demonstrating the complete enterprise data pipeline from ingestion to AI readiness.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
