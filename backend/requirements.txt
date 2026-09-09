@@ -1,0 +1,50 @@
+# ==========================================
+# Enterprise AI-Ready Data Platform
+# Sprint 2 - Backend Foundation
+# ==========================================
+
+# -------------------------
+# FastAPI Framework
+# -------------------------
+fastapi
+uvicorn[standard]
+
+# -------------------------
+# File Upload Support
+# -------------------------
+python-multipart
+
+# -------------------------
+# Data Processing
+# -------------------------
+pandas
+openpyxl
+pyarrow
+
+# -------------------------
+# Object Storage (MinIO)
+# -------------------------
+minio
+
+# -------------------------
+# Configuration
+# -------------------------
+pydantic-settings
+python-dotenv
+
+# -------------------------
+# Logging
+# -------------------------
+loguru
+
+# -------------------------
+# HTTP Client
+# -------------------------
+httpx
+
+# -------------------------
+# Development & Testing
+# -------------------------
+pytest
+black
+ruff

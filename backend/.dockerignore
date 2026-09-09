@@ -1,0 +1,12 @@
+# Local environment secrets
+.env
+
+# Local Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local application logs
+logs/

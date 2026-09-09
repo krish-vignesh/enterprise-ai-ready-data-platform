@@ -1,0 +1,26 @@
+#services used to define the services that will be run in the Docker Compose environment
+services:
+  minio:
+    image: minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    #first minio for server name and second image name for the server and the sha256 is the image digest to pin the image to a specific version
+    command: server /data --console-address ":9001"
+    #command to start the minio server and specify the data directory and console address
+    ports:
+        - "9000:9000"
+    #Host port: Container port 
+        - "9001:9001"
+    #ports to expose the minio server and console to the host machine
+    environment:
+        MINIO_ROOT_USER: ${MINIO_USERNAME}
+        # $ is used to reference the environment variable defined in the .env file and set the root user for the minio server
+        MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    #environment variables to set the root user and password for the minio server
+    volumes:
+      - minio_data:/data
+    #volume to persist the data stored in the minio server so even when container destroyed the data will be available in the volume
+    #This tell to mount this volume to the /data directory in the container so that the data stored in the minio server will be persisted in the volume
+volumes:
+  minio_data:
+    driver: local
+#Tells create a local volume named minio_data to store the data for the minio server
+#volume definition to create a local volume named minio_data to store the data for the minio server

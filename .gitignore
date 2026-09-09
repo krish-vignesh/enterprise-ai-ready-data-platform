@@ -1,0 +1,16 @@
+# Environment variables / secrets
+.env
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Local data
+data/
+
+# IDE
+.idea/
