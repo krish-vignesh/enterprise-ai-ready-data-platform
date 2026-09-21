@@ -14,3 +14,6 @@ data/
 
 # IDE
 .idea/
+
+#Infrastructure
+infrastructure/docker/spark/spark-4.2.0-bin-hadoop3.tgz

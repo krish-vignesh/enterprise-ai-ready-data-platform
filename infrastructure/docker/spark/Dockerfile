@@ -11,11 +11,13 @@ RUN apt-get update && \
     apt-get install -y python3.12 python3.12-venv python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and install Apache Spark 4.2.0
-RUN wget -q https://archive.apache.org/dist/spark/spark-4.2.0/spark-4.2.0-bin-hadoop3.tgz && \
-    tar -xzf spark-4.2.0-bin-hadoop3.tgz && \
-    mv spark-4.2.0-bin-hadoop3 /opt/spark && \
-    rm spark-4.2.0-bin-hadoop3.tgz
+# Copy the verified Apache Spark 4.2.0 distribution into the image
+COPY infrastructure/docker/spark/spark-4.2.0-bin-hadoop3.tgz /tmp/
+
+# Extract and install Spark
+RUN tar -xzf /tmp/spark-4.2.0-bin-hadoop3.tgz -C /opt && \
+    mv /opt/spark-4.2.0-bin-hadoop3 /opt/spark && \
+    rm /tmp/spark-4.2.0-bin-hadoop3.tgz 
 
 # Define the locations of Java and Spark inside the container
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
