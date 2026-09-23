@@ -48,3 +48,8 @@ httpx
 pytest
 black
 ruff
+
+# -------------------------
+# Apache Spark
+# -------------------------
+pyspark==4.2.0
