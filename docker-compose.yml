@@ -33,12 +33,20 @@ services:
   spark-worker-1:
     image: enterprise-spark:4.2.0
     #image to use for the spark worker container
+    environment:
+      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      #environment variables to set the AWS access key and secret access key for the spark worker container to connect to the minio server
     command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
     #command to start the spark worker container, used woker class and specify the spark master URL to connect to the spark master container
 
   spark-worker-2:
     image: enterprise-spark:4.2.0
     #image to use for the spark worker container
+    environment:
+      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      #environment variables to set the AWS access key and secret access key for the spark worker container to connect to the minio server
     command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
     #command to start the spark worker container, used woker class and specify the spark master URL to connect to the spark master container
 

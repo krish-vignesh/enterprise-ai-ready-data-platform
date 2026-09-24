@@ -19,7 +19,15 @@ RUN tar -xzf /tmp/spark-4.2.0-bin-hadoop3.tgz -C /opt && \
     mv /opt/spark-4.2.0-bin-hadoop3 /opt/spark && \
     rm /tmp/spark-4.2.0-bin-hadoop3.tgz 
 
-# Define the locations of Java and Spark inside the container
+# Add S3A support for MinIO / S3-compatible object storage
+RUN wget -q -O /opt/spark/jars/hadoop-aws-3.5.0.jar \
+        https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.5.0/hadoop-aws-3.5.0.jar && \
+    wget -q -O /opt/spark/jars/bundle-2.35.4.jar \
+        https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.35.4/bundle-2.35.4.jar && \
+    wget -q -O /opt/spark/jars/analyticsaccelerator-s3-1.3.1.jar \
+        https://repo1.maven.org/maven2/software/amazon/s3/analyticsaccelerator/analyticsaccelerator-s3/1.3.1/analyticsaccelerator-s3-1.3.1.jar
+
+    # Define the locations of Java and Spark inside the container
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 ENV SPARK_HOME=/opt/spark
 
