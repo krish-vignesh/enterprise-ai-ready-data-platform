@@ -19,6 +19,19 @@ services:
       - minio_data:/data
     #volume to persist the data stored in the minio server so even when container destroyed the data will be available in the volume
     #This tell to mount this volume to the /data directory in the container so that the data stored in the minio server will be persisted in the volume
+
+  minio-init:
+    image: enterprise-minio-init:1.0
+    environment:
+      MINIO_ENDPOINT: minio:9000
+      MINIO_USERNAME: ${MINIO_USERNAME}
+      MINIO_PASSWORD: ${MINIO_PASSWORD}
+    depends_on:
+      - minio
+    # Run the minio-init container after the minio container is up and running
+    restart: "no"
+    # Run the minio-init container only once and do not restart it after it has completed its task
+
   spark-master:
    image: enterprise-spark:4.2.0
    #image to use for the spark master container
@@ -49,6 +62,26 @@ services:
       #environment variables to set the AWS access key and secret access key for the spark worker container to connect to the minio server
     command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
     #command to start the spark worker container, used woker class and specify the spark master URL to connect to the spark master container
+
+  spark-driver:
+    #image to use for the spark driver container, for learning and development purposes, we can use the same image as the spark master and worker containers
+    image: enterprise-spark:4.2.0
+    environment:
+      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      PYTHONPATH: /workspace
+      SPARK_CONF_DIR: /workspace/infrastructure/config/spark
+      #Spark_conf_dir is used to specify the directory where the spark configuration files are located, in this case, we are using the spark configuration files from the infrastructure/config/spark directory in the workspace
+    volumes:
+      - ./:/workspace
+    ports:
+      - "4040:4040"
+    command: [ "sleep", "infinity" ]
+    depends_on:
+      - spark-master
+      - spark-worker-1
+      - spark-worker-2
+      - minio
 
 
 volumes:

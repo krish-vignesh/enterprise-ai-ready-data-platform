@@ -1,0 +1,2 @@
+# Using minio version 7.2.20 to ensure compatibility with the latest features and security updates.
+minio==7.2.20

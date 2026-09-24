@@ -72,14 +72,9 @@ foreach ($property in $s3aProperties) {
 }
 
 # Prepare the Spark submit command with the provided arguments
-docker run --rm --network enterprise-ai-ready-data-platform_default `
-    -p "4040:4040" `
-    -v "${projectRoot}:/workspace" `
-    -e AWS_ACCESS_KEY_ID `
-    -e AWS_SECRET_ACCESS_KEY `
-    -e PYTHONPATH=/workspace `
-    -e SPARK_CONF_DIR=/workspace/infrastructure/config/spark `
-    enterprise-spark:4.2.0 `
+docker compose exec `
+    -T `
+    spark-driver `
     spark-submit `
     --master spark://spark-master:7077 `
     $sparkS3aConf `
