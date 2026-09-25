@@ -83,6 +83,22 @@ services:
       - spark-worker-2
       - minio
 
+  spark-history-server:
+    image: enterprise-spark:4.2.0
+    environment:
+      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      SPARK_HISTORY_OPTS: "-Dspark.history.fs.logDirectory=s3a://spark-events/"
+    volumes:
+      - ./infrastructure/config/spark:/opt/spark/conf
+    command:
+      - /opt/spark/bin/spark-class
+      - org.apache.spark.deploy.history.HistoryServer
+    ports:
+      - "18080:18080"
+    depends_on:
+      - minio
+
 
 volumes:
   minio_data:
