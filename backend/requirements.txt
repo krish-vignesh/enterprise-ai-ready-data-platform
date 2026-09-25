@@ -20,6 +20,9 @@ python-multipart
 pandas
 openpyxl
 pyarrow
+pypdf
+camelot-py
+python-docx
 
 # -------------------------
 # Object Storage (MinIO)

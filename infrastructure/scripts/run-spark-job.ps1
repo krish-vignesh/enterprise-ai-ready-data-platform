@@ -74,6 +74,8 @@ foreach ($property in $s3aProperties) {
 # Prepare the Spark submit command with the provided arguments
 docker compose exec `
     -T `
+    -e AWS_ACCESS_KEY_ID="$minioUsername" `
+    -e AWS_SECRET_ACCESS_KEY="$minioPassword" `
     spark-driver `
     spark-submit `
     --master spark://spark-master:7077 `

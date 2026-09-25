@@ -17,3 +17,7 @@ data/
 
 #Infrastructure
 infrastructure/docker/spark/spark-4.2.0-bin-hadoop3.tgz
+
+# Local ingestion experiment fixtures
+experiments/ingestion/data/*.xlsx
+experiments/ingestion/data/*.pdf

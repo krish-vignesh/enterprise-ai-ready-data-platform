@@ -69,7 +69,7 @@ services:
     environment:
       AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
       AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
-      PYTHONPATH: /workspace
+      PYTHONPATH: /workspace/backend:/opt/spark/python
       SPARK_CONF_DIR: /workspace/infrastructure/config/spark
       #Spark_conf_dir is used to specify the directory where the spark configuration files are located, in this case, we are using the spark configuration files from the infrastructure/config/spark directory in the workspace
     volumes:

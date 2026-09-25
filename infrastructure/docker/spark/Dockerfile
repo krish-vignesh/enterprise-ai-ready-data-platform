@@ -11,6 +11,9 @@ RUN apt-get update && \
     apt-get install -y python3.12 python3.12-venv python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
+# Install the minimum Python packages needed for the current ingestion-to-Spark path
+RUN python3.12 -m pip install --no-cache-dir --break-system-packages pandas openpyxl camelot-py
+
 # Copy the verified Apache Spark 4.2.0 distribution into the image
 COPY infrastructure/docker/spark/spark-4.2.0-bin-hadoop3.tgz /tmp/
 
@@ -39,4 +42,4 @@ ENV PYSPARK_PYTHON=/usr/bin/python3.12
 ENV PYSPARK_DRIVER_PYTHON=/usr/bin/python3.12
 
 # Tell Python where Spark's Python libraries are located
-ENV PYTHONPATH="${SPARK_HOME}/python"
+ENV PYTHONPATH="/workspace/backend:${SPARK_HOME}/python"
