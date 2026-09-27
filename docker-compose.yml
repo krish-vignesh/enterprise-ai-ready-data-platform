@@ -33,6 +33,9 @@ services:
     # Run the minio-init container only once and do not restart it after it has completed its task
 
   spark-master:
+   build:
+     context: .
+     dockerfile: infrastructure/docker/spark/Dockerfile
    image: enterprise-spark:4.2.0
    #image to use for the spark master container
    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
@@ -44,6 +47,9 @@ services:
     #we left 7077 port because it is the default port for spark master to communicate with spark workers and we don't need to expose it to the host machine
 
   spark-worker-1:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/spark/Dockerfile
     image: enterprise-spark:4.2.0
     #image to use for the spark worker container
     environment:
@@ -54,6 +60,9 @@ services:
     #command to start the spark worker container, used woker class and specify the spark master URL to connect to the spark master container
 
   spark-worker-2:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/spark/Dockerfile
     image: enterprise-spark:4.2.0
     #image to use for the spark worker container
     environment:
@@ -65,10 +74,15 @@ services:
 
   spark-driver:
     #image to use for the spark driver container, for learning and development purposes, we can use the same image as the spark master and worker containers
+    build:
+      context: .
+      dockerfile: infrastructure/docker/spark/Dockerfile
     image: enterprise-spark:4.2.0
     environment:
       AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
       AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      MINIO_HOST: minio
+      MINIO_PORT: 9000
       PYTHONPATH: /workspace/backend:/opt/spark/python
       SPARK_CONF_DIR: /workspace/infrastructure/config/spark
       #Spark_conf_dir is used to specify the directory where the spark configuration files are located, in this case, we are using the spark configuration files from the infrastructure/config/spark directory in the workspace
@@ -84,6 +98,9 @@ services:
       - minio
 
   spark-history-server:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/spark/Dockerfile
     image: enterprise-spark:4.2.0
     environment:
       AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}

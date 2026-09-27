@@ -11,8 +11,16 @@ RUN apt-get update && \
     apt-get install -y python3.12 python3.12-venv python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
-# Install the minimum Python packages needed for the current ingestion-to-Spark path
-RUN python3.12 -m pip install --no-cache-dir --break-system-packages pandas openpyxl camelot-py
+# Install the minimum Python packages needed for the current ingestion-to-Spark path.
+# Include the runtime dependencies required by the Bronze integration test.
+RUN python3.12 -m pip install --no-cache-dir --break-system-packages \
+    pandas \
+    openpyxl \
+    camelot-py \
+    delta-spark==4.4.0 \
+    pydantic \
+    pydantic-settings \
+    minio
 
 # Copy the verified Apache Spark 4.2.0 distribution into the image
 COPY infrastructure/docker/spark/spark-4.2.0-bin-hadoop3.tgz /tmp/
@@ -28,7 +36,11 @@ RUN wget -q -O /opt/spark/jars/hadoop-aws-3.5.0.jar \
     wget -q -O /opt/spark/jars/bundle-2.35.4.jar \
         https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.35.4/bundle-2.35.4.jar && \
     wget -q -O /opt/spark/jars/analyticsaccelerator-s3-1.3.1.jar \
-        https://repo1.maven.org/maven2/software/amazon/s3/analyticsaccelerator/analyticsaccelerator-s3/1.3.1/analyticsaccelerator-s3-1.3.1.jar
+        https://repo1.maven.org/maven2/software/amazon/s3/analyticsaccelerator/analyticsaccelerator-s3/1.3.1/analyticsaccelerator-s3-1.3.1.jar && \
+    wget -q -O /opt/spark/jars/delta-spark_2.13-4.4.0.jar \
+        https://repo1.maven.org/maven2/io/delta/delta-spark_2.13/4.4.0/delta-spark_2.13-4.4.0.jar && \
+    wget -q -O /opt/spark/jars/delta-storage-4.4.0.jar \
+        https://repo1.maven.org/maven2/io/delta/delta-storage/4.4.0/delta-storage-4.4.0.jar
 
     # Define the locations of Java and Spark inside the container
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
