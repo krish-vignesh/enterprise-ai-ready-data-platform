@@ -116,7 +116,35 @@ services:
     depends_on:
       - minio
 
-
+  jupyter-workspace:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/jupyter/Dockerfile
+    image: enterprise-jupyter:4.2.0
+    environment:
+      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      MINIO_HOST: minio
+      MINIO_PORT: 9000
+      PYSPARK_PYTHON: /usr/bin/python3.12
+      PYSPARK_DRIVER_PYTHON: /usr/bin/python3.12
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_DRIVER_HOST: jupyter-workspace
+      SPARK_DRIVER_BIND_ADDRESS: 0.0.0.0
+      SPARK_LOCAL_HOSTNAME: jupyter-workspace
+      SPARK_CONF_DIR: /workspace/infrastructure/config/spark
+    volumes:
+      - ./:/workspace
+    ports:
+      - "8888:8888"
+      - "4041:4040"
+    depends_on:
+      - spark-master
+      - spark-worker-1
+      - spark-worker-2
+      - minio
+ 
+ 
 volumes:
   minio_data:
     driver: local
