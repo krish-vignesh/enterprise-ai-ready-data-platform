@@ -25,7 +25,9 @@ RUN python3.12 -m pip install --no-cache-dir --break-system-packages \
         "pyspark==4.2.0" \
         "delta-spark==4.4.0" \
         "jupyterlab==4.3.6" \
-        "minio==7.2.15"
+        "minio==7.2.15" \
+        "pydantic" \
+        "pydantic-settings"
 
 # Align the Workspace runtime with the existing Spark platform runtime.
 # The Python executable is /usr/bin/python3.12, not /usr/local/bin/python.

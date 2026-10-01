@@ -9,7 +9,12 @@ MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "minio:9000")
 MINIO_ACCESS_KEY = os.environ["MINIO_USERNAME"]
 MINIO_SECRET_KEY = os.environ["MINIO_PASSWORD"]
 
-BUCKET_NAME = "spark-events"
+AI_DATA_BUCKET_NAME = "ai-data"
+SPARK_EVENTS_BUCKET_NAME = "spark-events"
+WORKSPACE_RECORDS_BUCKET_NAME = os.getenv(
+    "WORKSPACE_RECORDS_BUCKET",
+    "workspace-records",
+)
 
 MAX_RETRIES = 30
 RETRY_DELAY_SECONDS = 2
@@ -25,12 +30,17 @@ def create_bucket() -> None:
 
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            if client.bucket_exists(BUCKET_NAME):
-                print(f"Bucket '{BUCKET_NAME}' already exists.")
-                return
+            for bucket_name in (
+                AI_DATA_BUCKET_NAME,
+                SPARK_EVENTS_BUCKET_NAME,
+                WORKSPACE_RECORDS_BUCKET_NAME,
+            ):
+                if client.bucket_exists(bucket_name):
+                    print(f"Bucket '{bucket_name}' already exists.")
+                    continue
 
-            client.make_bucket(BUCKET_NAME)
-            print(f"Bucket '{BUCKET_NAME}' created successfully.")
+                client.make_bucket(bucket_name)
+                print(f"Bucket '{bucket_name}' created successfully.")
             return
 
         except Exception as exc:

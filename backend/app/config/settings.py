@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     minio_port: int
     minio_username: str
     minio_password: str
+    workspace_records_bucket: str
 
 
 settings = Settings()
-
