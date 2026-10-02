@@ -35,6 +35,6 @@ def read_notebook(workspace_id: str, notebook_name: str) -> bytes:
     response = client.get_object(BUCKET_NAME, object_name)
     try:
         return response.read()
-    finally:
+    finally: 
         response.close()
         response.release_conn()
