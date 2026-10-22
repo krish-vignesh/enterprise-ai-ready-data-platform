@@ -8,9 +8,11 @@ __pycache__/
 
 # Virtual environment
 .venv/
+.venv-uv/
 
 # Local data
 data/
+/python-dependencies-before-uv.txt
 
 # IDE
 .idea/

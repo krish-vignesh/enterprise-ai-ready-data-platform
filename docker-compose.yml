@@ -21,6 +21,9 @@ services:
     #This tell to mount this volume to the /data directory in the container so that the data stored in the minio server will be persisted in the volume
 
   minio-init:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/minio_init/Dockerfile
     image: enterprise-minio-init:1.0
     environment:
       MINIO_ENDPOINT: minio:9000
@@ -29,9 +32,7 @@ services:
       WORKSPACE_RECORDS_BUCKET: ${WORKSPACE_RECORDS_BUCKET}
     depends_on:
       - minio
-    # Run the minio-init container after the minio container is up and running
     restart: "no"
-    # Run the minio-init container only once and do not restart it after it has completed its task
 
   spark-master:
    build:
@@ -128,8 +129,8 @@ services:
       AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
       MINIO_HOST: minio
       MINIO_PORT: 9000
-      PYSPARK_PYTHON: /usr/bin/python3.12
-      PYSPARK_DRIVER_PYTHON: /usr/bin/python3.12
+      PYSPARK_PYTHON: /opt/uv-venv/bin/python
+      PYSPARK_DRIVER_PYTHON: /opt/uv-venv/bin/python
       SPARK_MASTER_URL: spark://spark-master:7077
       SPARK_DRIVER_HOST: jupyter-workspace
       SPARK_DRIVER_BIND_ADDRESS: 0.0.0.0
@@ -145,10 +146,33 @@ services:
       - spark-worker-1
       - spark-worker-2
       - minio
- 
- 
+
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+
+
 volumes:
   minio_data:
+    driver: local
+  postgres_data:
     driver: local
 #Tells create a local volume named minio_data to store the data for the minio server
 #volume definition to create a local volume named minio_data to store the data for the minio server

@@ -1,0 +1,32 @@
+# Git metadata
+.git/
+
+# Secrets and local configuration
+.env
+**/.env
+
+# Python virtual environments
+.venv/
+.venv-uv/
+**/.venv/
+**/.venv-uv/
+
+# Python caches and test artifacts
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+**/.pytest_cache/
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Temporary dependency inventory
+/python-dependencies-before-uv.txt
+
+# Local data and test fixtures
+data/
+experiments/ingestion/data/*.xlsx
+experiments/ingestion/data/*.pdf
+
+# Frontend dependencies
+frontend/node_modules/
