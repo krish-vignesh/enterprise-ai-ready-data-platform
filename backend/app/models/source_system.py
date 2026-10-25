@@ -1,10 +1,11 @@
 
 """Source system entity for the platform catalog."""
 
+from uuid import UUID
+
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from uuid import UUID
 from app.db.base import Base
 from app.models.mixins import TimestampMixin, uuid7_primary_key
 
@@ -26,12 +27,6 @@ class SourceSystem(TimestampMixin, Base):
         String(255),
         nullable=False,
     )
-
-    source_type: Mapped[str] = mapped_column(
-        String(64),
-        nullable=False,
-    )
-
 
     source_type: Mapped[str] = mapped_column(
         String(64),

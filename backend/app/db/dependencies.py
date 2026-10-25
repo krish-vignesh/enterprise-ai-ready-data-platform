@@ -1,18 +1,28 @@
+
 """FastAPI dependencies for database session management."""
 
-from collections.abc import Generator
-#Generator is imported from collections.abc to provide type hinting for the get_db function, indicating that it yields a SQLAlchemy Session object.
+from collections.abc import AsyncIterator
+import logging
 
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import SessionLocal
+from app.db.session import AsyncSessionLocal
 
 
-def get_db() -> Generator[Session, None, None]:
-    """Provide one database session and close it after use."""
-    db = SessionLocal()
+logger = logging.getLogger(__name__)
+
+
+async def get_db() -> AsyncIterator[AsyncSession]:
+    """Provide a request-scoped asynchronous database session."""
+    session = AsyncSessionLocal()
 
     try:
-        yield db
+        yield session
+    except Exception:
+        try:
+            await session.rollback()
+        except Exception:
+            logger.exception("database.session.rollback_failed")
+        raise
     finally:
-        db.close()
+        await session.close()

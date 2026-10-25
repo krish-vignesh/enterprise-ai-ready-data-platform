@@ -1,10 +1,7 @@
-"""Database package for the application.
 
-This package centralizes the SQLAlchemy declarative base and the engine/session
-lifecycle used by the platform.
-"""
+"""Database package for the application."""
 
 from app.db.base import Base
-from app.db.session import SessionLocal, engine
+from app.db.session import AsyncSessionLocal, engine
 
-__all__ = ["Base", "SessionLocal", "engine"]
+__all__ = ["Base", "AsyncSessionLocal", "engine"]
