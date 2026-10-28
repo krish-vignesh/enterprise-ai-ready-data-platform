@@ -20,35 +20,41 @@ class DocumentRepository:
         """Initialize with the session owned by the caller."""
         self.session = session
 
-    async def get_by_id(self, document_id: UUID) -> Document | None:
-        """Return a document by UUID, or None if it does not exist."""
-        try:
-            document = await self.session.get(Document, document_id)
-
-            logger.debug(
-                "repository.document.get_by_id completed document_id=%s found=%s",
+    async def get_by_id(
+            self,
+            document_id: UUID,
+            *,
+            for_update: bool = False,
+    ) -> Document | None:
+        """Get a document by ID, optionally locking its database row."""
+        if for_update:
+            return await self.session.get(
+                Document,
                 document_id,
-                document is not None,
+                with_for_update=True,
+                populate_existing=True
             )
-            return document
 
-        except Exception:
-            logger.exception(
-                "repository.document.get_by_id failed document_id=%s",
-                document_id,
-            )
-            raise
+        return await self.session.get(Document, document_id)
 
     async def get_by_dataset_and_sha256(
-        self,
-        dataset_id: UUID,
-        sha256: str,
+            self,
+            dataset_id: UUID,
+            sha256: str,
+            *,
+            for_update: bool = False,
     ) -> Document | None:
-        """Return a document matching a dataset and SHA-256 hash."""
+        """Return a document matching a dataset and SHA-256 hash.
+
+        Optionally lock the matching row until the current transaction ends.
+        """
         statement = select(Document).where(
             Document.dataset_id == dataset_id,
             Document.sha256 == sha256,
         )
+
+        if for_update:
+            statement = statement.with_for_update()
 
         try:
             result = await self.session.scalars(statement)
@@ -56,15 +62,17 @@ class DocumentRepository:
 
             logger.debug(
                 "repository.document.get_by_dataset_and_sha256 completed "
-                "dataset_id=%s found=%s",
+                "dataset_id=%s found=%s for_update=%s",
                 dataset_id,
                 document is not None,
+                for_update,
             )
             return document
 
         except Exception:
             logger.exception(
-                "repository.document.get_by_dataset_and_sha256 failed dataset_id=%s",
+                "repository.document.get_by_dataset_and_sha256 failed "
+                "dataset_id=%s",
                 dataset_id,
             )
             raise

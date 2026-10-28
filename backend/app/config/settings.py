@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,6 +23,11 @@ class Settings(BaseSettings):
     workspace_records_bucket: str
 
     database_url: str
+
+    max_upload_file_size_bytes: int = Field(
+        default=50 * 1024 * 1024,
+        gt=0,
+    )
 
 
 settings = Settings()

@@ -2,11 +2,7 @@ from pyspark.sql import SparkSession
 
 
 def main():
-    spark = (
-        SparkSession.builder
-        .appName("Spark Partition Experiment")
-        .getOrCreate()
-    )
+    spark = SparkSession.builder.appName("Spark Partition Experiment").getOrCreate()
 
     print("\n========== CONFIG CHECK VERSION 2 ==========")
 
@@ -16,11 +12,7 @@ def main():
 
     print("========== END CONFIG CHECK ==========")
 
-    input_path = (
-        "s3a://ai-data/"
-        "spark_scaling_customers/"
-        "spark_scaling_customers.jsonl"
-    )
+    input_path = "s3a://ai-data/spark_scaling_customers/spark_scaling_customers.jsonl"
 
     print("Reading:", input_path)
 
@@ -64,4 +56,3 @@ if __name__ == "__main__":
     main()
 
     print("========== EXPERIMENT COMPLETE ==========\n")
-

@@ -1,4 +1,3 @@
-
 """Database package for the application."""
 
 from app.db.base import Base

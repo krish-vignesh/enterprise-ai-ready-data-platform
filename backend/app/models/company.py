@@ -1,4 +1,3 @@
-
 """Company entity for the platform catalog."""
 
 from sqlalchemy import String

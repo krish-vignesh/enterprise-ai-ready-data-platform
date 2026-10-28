@@ -1,4 +1,3 @@
-
 """Reusable SQLAlchemy model fields and mixins."""
 
 from datetime import datetime, timezone

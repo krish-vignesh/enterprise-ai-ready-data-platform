@@ -17,15 +17,26 @@ def test_process_source_artifact_new_artifact_happy_path() -> None:
     spark = Mock()
     source_artifact = _source_artifact()
 
-    with patch("app.services.ingest.artifact_exists", return_value=False) as mock_artifact_exists, \
-        patch("app.services.ingest.run_bronze_ingestion", return_value={
-            "status": "success",
-            "ingestion_id": "ing-123",
-            "bronze_table_path": "s3a://ai-data/bronze/tables/test_dataset/",
-        }) as mock_bronze, \
-        patch("app.services.ingest.run_silver_pipeline", return_value=Mock()) as mock_silver, \
-        patch("app.services.ingest.write_processed_artifact") as mock_processed_artifact, \
-        patch("app.services.ingest.write_processing_state") as mock_processing_state:
+    with (
+        patch(
+            "app.services.ingest.artifact_exists", return_value=False
+        ) as mock_artifact_exists,
+        patch(
+            "app.services.ingest.run_bronze_ingestion",
+            return_value={
+                "status": "success",
+                "ingestion_id": "ing-123",
+                "bronze_table_path": "s3a://ai-data/bronze/tables/test_dataset/",
+            },
+        ) as mock_bronze,
+        patch(
+            "app.services.ingest.run_silver_pipeline", return_value=Mock()
+        ) as mock_silver,
+        patch(
+            "app.services.ingest.write_processed_artifact"
+        ) as mock_processed_artifact,
+        patch("app.services.ingest.write_processing_state") as mock_processing_state,
+    ):
         result = process_source_artifact(
             source_artifact=source_artifact,
             dataset_name="test_dataset",
@@ -50,11 +61,17 @@ def test_process_source_artifact_skips_when_already_processed() -> None:
     source_artifact = _source_artifact()
     spark = Mock()
 
-    with patch("app.services.ingest.artifact_exists", return_value=True) as mock_artifact_exists, \
-        patch("app.services.ingest.run_bronze_ingestion") as mock_bronze, \
-        patch("app.services.ingest.run_silver_pipeline") as mock_silver, \
-        patch("app.services.ingest.write_processed_artifact") as mock_processed_artifact, \
-        patch("app.services.ingest.write_processing_state") as mock_processing_state:
+    with (
+        patch(
+            "app.services.ingest.artifact_exists", return_value=True
+        ) as mock_artifact_exists,
+        patch("app.services.ingest.run_bronze_ingestion") as mock_bronze,
+        patch("app.services.ingest.run_silver_pipeline") as mock_silver,
+        patch(
+            "app.services.ingest.write_processed_artifact"
+        ) as mock_processed_artifact,
+        patch("app.services.ingest.write_processing_state") as mock_processing_state,
+    ):
         result = process_source_artifact(
             source_artifact=source_artifact,
             dataset_name="test_dataset",
@@ -80,11 +97,18 @@ def test_process_source_artifact_propagates_bronze_failure() -> None:
     source_artifact = _source_artifact()
     spark = Mock()
 
-    with patch("app.services.ingest.artifact_exists", return_value=False), \
-        patch("app.services.ingest.run_bronze_ingestion", side_effect=RuntimeError("bronze failed")), \
-        patch("app.services.ingest.run_silver_pipeline") as mock_silver, \
-        patch("app.services.ingest.write_processed_artifact") as mock_processed_artifact, \
-        patch("app.services.ingest.write_processing_state") as mock_processing_state:
+    with (
+        patch("app.services.ingest.artifact_exists", return_value=False),
+        patch(
+            "app.services.ingest.run_bronze_ingestion",
+            side_effect=RuntimeError("bronze failed"),
+        ),
+        patch("app.services.ingest.run_silver_pipeline") as mock_silver,
+        patch(
+            "app.services.ingest.write_processed_artifact"
+        ) as mock_processed_artifact,
+        patch("app.services.ingest.write_processing_state") as mock_processing_state,
+    ):
         try:
             process_source_artifact(
                 source_artifact=source_artifact,
@@ -110,15 +134,25 @@ def test_process_source_artifact_propagates_silver_failure() -> None:
     source_artifact = _source_artifact()
     spark = Mock()
 
-    with patch("app.services.ingest.artifact_exists", return_value=False), \
-        patch("app.services.ingest.run_bronze_ingestion", return_value={
-            "status": "success",
-            "ingestion_id": "ing-456",
-            "bronze_table_path": "s3a://ai-data/bronze/tables/test_dataset/",
-        }), \
-        patch("app.services.ingest.run_silver_pipeline", side_effect=RuntimeError("silver failed")) as mock_silver, \
-        patch("app.services.ingest.write_processed_artifact") as mock_processed_artifact, \
-        patch("app.services.ingest.write_processing_state") as mock_processing_state:
+    with (
+        patch("app.services.ingest.artifact_exists", return_value=False),
+        patch(
+            "app.services.ingest.run_bronze_ingestion",
+            return_value={
+                "status": "success",
+                "ingestion_id": "ing-456",
+                "bronze_table_path": "s3a://ai-data/bronze/tables/test_dataset/",
+            },
+        ),
+        patch(
+            "app.services.ingest.run_silver_pipeline",
+            side_effect=RuntimeError("silver failed"),
+        ) as mock_silver,
+        patch(
+            "app.services.ingest.write_processed_artifact"
+        ) as mock_processed_artifact,
+        patch("app.services.ingest.write_processing_state") as mock_processing_state,
+    ):
         try:
             process_source_artifact(
                 source_artifact=source_artifact,
@@ -144,15 +178,23 @@ def test_process_source_artifact_propagates_processed_artifact_write_failure() -
     source_artifact = _source_artifact()
     spark = Mock()
 
-    with patch("app.services.ingest.artifact_exists", return_value=False), \
-        patch("app.services.ingest.run_bronze_ingestion", return_value={
-            "status": "success",
-            "ingestion_id": "ing-789",
-            "bronze_table_path": "s3a://ai-data/bronze/tables/test_dataset/",
-        }), \
-        patch("app.services.ingest.run_silver_pipeline", return_value=Mock()), \
-        patch("app.services.ingest.write_processed_artifact", side_effect=RuntimeError("processed artifact write failed")), \
-        patch("app.services.ingest.write_processing_state") as mock_processing_state:
+    with (
+        patch("app.services.ingest.artifact_exists", return_value=False),
+        patch(
+            "app.services.ingest.run_bronze_ingestion",
+            return_value={
+                "status": "success",
+                "ingestion_id": "ing-789",
+                "bronze_table_path": "s3a://ai-data/bronze/tables/test_dataset/",
+            },
+        ),
+        patch("app.services.ingest.run_silver_pipeline", return_value=Mock()),
+        patch(
+            "app.services.ingest.write_processed_artifact",
+            side_effect=RuntimeError("processed artifact write failed"),
+        ),
+        patch("app.services.ingest.write_processing_state") as mock_processing_state,
+    ):
         try:
             process_source_artifact(
                 source_artifact=source_artifact,
@@ -165,7 +207,9 @@ def test_process_source_artifact_propagates_processed_artifact_write_failure() -
                 spark=spark,
                 silver_table_path="s3a://ai-data/silver/tables/test_dataset/",
             )
-            raise AssertionError("RuntimeError expected from ProcessedArtifact write failure")
+            raise AssertionError(
+                "RuntimeError expected from ProcessedArtifact write failure"
+            )
         except RuntimeError as exc:
             assert "processed artifact write failed" in str(exc)
 

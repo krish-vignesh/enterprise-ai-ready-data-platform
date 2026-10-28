@@ -1,5 +1,5 @@
 from enum import Enum
-#enum means enumeration, which is a set of symbolic names (members) bound to unique, constant values. In this case, the ExecutionMode class is an enumeration that defines two possible execution modes for a processing run: FULL and INCREMENTAL.
+# enum means enumeration, which is a set of symbolic names (members) bound to unique, constant values. In this case, the ExecutionMode class is an enumeration that defines two possible execution modes for a processing run: FULL and INCREMENTAL.
 
 
 class ExecutionMode(str, Enum):

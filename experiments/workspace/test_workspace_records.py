@@ -18,7 +18,9 @@ try:
     from app.workspace.metadata import WorkspaceMetadata
     from app.workspace.notebook import read_notebook, save_notebook
     from app.workspace.storage import read_metadata, save_metadata
-except Exception as exc:  # pragma: no cover - validation script must report runtime failures cleanly
+except (
+    Exception
+) as exc:  # pragma: no cover - validation script must report runtime failures cleanly
     print(f"Notebook object path: {notebook_object_path}")
     print(f"Metadata object path: {metadata_object_path}")
     print("Notebook persistence: FAIL")
@@ -34,7 +36,10 @@ def main() -> None:
             {
                 "cell_type": "markdown",
                 "metadata": {},
-                "source": ["# Workspace Records Validation\n", "This is an experiment.\n"],
+                "source": [
+                    "# Workspace Records Validation\n",
+                    "This is an experiment.\n",
+                ],
             },
             {
                 "cell_type": "code",
@@ -99,7 +104,9 @@ def main() -> None:
             notebook_read_back = read_notebook(workspace_id, notebook_name)
             notebook_ok = notebook_read_back == notebook_bytes
             print(f"Notebook persistence: {'PASS' if notebook_ok else 'FAIL'}")
-        except Exception as exc:  # pragma: no cover - validation script reports failures
+        except (
+            Exception
+        ) as exc:  # pragma: no cover - validation script reports failures
             notebook_ok = False
             print("Notebook persistence: FAIL")
             print(f"Notebook read error: {exc}")
@@ -109,9 +116,13 @@ def main() -> None:
     if metadata_ok:
         try:
             metadata_read_back = read_metadata(workspace_id, notebook_name)
-            metadata_ok = metadata_read_back.model_dump(mode="json") == metadata.model_dump(mode="json")
+            metadata_ok = metadata_read_back.model_dump(
+                mode="json"
+            ) == metadata.model_dump(mode="json")
             print(f"Metadata persistence: {'PASS' if metadata_ok else 'FAIL'}")
-        except Exception as exc:  # pragma: no cover - validation script reports failures
+        except (
+            Exception
+        ) as exc:  # pragma: no cover - validation script reports failures
             metadata_ok = False
             print("Metadata persistence: FAIL")
             print(f"Metadata read error: {exc}")

@@ -1,4 +1,3 @@
-
 """Integration tests for FastAPI database dependency lifecycle."""
 
 from unittest.mock import MagicMock, patch
@@ -13,12 +12,10 @@ from app.db.dependencies import get_db
 app = FastAPI()
 
 
-
 @app.get("/test-db")
 def db_test_endpoint(db: Session = Depends(get_db)) -> dict[str, str]:
     """A minimal endpoint that receives a database session."""
     return {"status": "session received"}
-
 
 
 def test_fastapi_closes_db_session_after_request() -> None:

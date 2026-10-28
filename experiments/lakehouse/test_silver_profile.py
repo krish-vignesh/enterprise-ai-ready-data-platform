@@ -12,8 +12,7 @@ from backend.app.lakehouse.silver.profile import profile_dataframe
 
 def main() -> None:
     spark = (
-        SparkSession.builder
-        .master("local[1]")
+        SparkSession.builder.master("local[1]")
         .appName("test-silver-profile")
         .getOrCreate()
     )
@@ -29,7 +28,9 @@ def main() -> None:
         assert normal_profile.column_count == 3
         assert normal_profile.exact_duplicate_row_count == 0
 
-        normal_columns = {column.column_name: column for column in normal_profile.columns}
+        normal_columns = {
+            column.column_name: column for column in normal_profile.columns
+        }
         assert normal_columns["age"].minimum == 20
         assert normal_columns["age"].maximum == 40
         assert float(normal_columns["age"].mean) == 30.0

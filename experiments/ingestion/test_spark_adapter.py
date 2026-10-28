@@ -6,8 +6,7 @@ from app.ingestion.spark_adapter import pandas_to_spark_dataframe
 
 def main():
     spark = (
-        SparkSession.builder
-        .appName("Spark Adapter Test")
+        SparkSession.builder.appName("Spark Adapter Test")
         .master("local[*]")
         .config("spark.eventLog.enabled", "false")
         .getOrCreate()

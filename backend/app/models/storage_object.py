@@ -1,4 +1,3 @@
-
 """Storage object entity for the platform catalog."""
 
 from datetime import datetime

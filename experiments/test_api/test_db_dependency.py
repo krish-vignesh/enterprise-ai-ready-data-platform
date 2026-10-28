@@ -1,4 +1,3 @@
-
 """Tests for the backend database session dependency."""
 
 from unittest.mock import MagicMock, patch

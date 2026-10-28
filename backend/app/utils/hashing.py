@@ -1,4 +1,3 @@
-
 """Utilities for calculating file content hashes."""
 
 from hashlib import sha256

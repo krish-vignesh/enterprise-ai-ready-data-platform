@@ -1,4 +1,3 @@
-
 """FastAPI dependencies for database session management."""
 
 from collections.abc import AsyncIterator

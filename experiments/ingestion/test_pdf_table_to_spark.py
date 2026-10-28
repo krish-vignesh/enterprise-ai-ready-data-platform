@@ -16,8 +16,7 @@ PDF_PATH = REPO_ROOT / "experiments" / "ingestion" / "data" / "sample_customers.
 
 def main():
     spark = (
-        SparkSession.builder
-        .master("spark://spark-master:7077")
+        SparkSession.builder.master("spark://spark-master:7077")
         .appName("PDF Table to Spark Adapter Experiment")
         .config("spark.eventLog.enabled", "false")
         .getOrCreate()

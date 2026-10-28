@@ -16,8 +16,7 @@ EXCEL_PATH = REPO_ROOT / "experiments" / "ingestion" / "data" / "sample_customer
 
 def main():
     spark = (
-        SparkSession.builder
-        .master("spark://spark-master:7077")
+        SparkSession.builder.master("spark://spark-master:7077")
         .appName("Excel to Spark Adapter Experiment")
         .config("spark.eventLog.enabled", "false")
         .getOrCreate()

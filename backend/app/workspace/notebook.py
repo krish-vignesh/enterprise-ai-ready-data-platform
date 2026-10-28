@@ -10,7 +10,9 @@ def _notebook_object_path(workspace_id: str, notebook_name: str) -> str:
     return f"workspaces/{workspace_id}/notebooks/{notebook_name}.ipynb"
 
 
-def save_notebook(workspace_id: str, notebook_name: str, notebook_content: bytes | str) -> str:
+def save_notebook(
+    workspace_id: str, notebook_name: str, notebook_content: bytes | str
+) -> str:
     object_name = _notebook_object_path(workspace_id, notebook_name)
     payload = (
         notebook_content.encode("utf-8")
@@ -35,6 +37,6 @@ def read_notebook(workspace_id: str, notebook_name: str) -> bytes:
     response = client.get_object(BUCKET_NAME, object_name)
     try:
         return response.read()
-    finally: 
+    finally:
         response.close()
         response.release_conn()

@@ -1,4 +1,3 @@
-
 """Configure the asynchronous SQLAlchemy engine and session factory."""
 
 from __future__ import annotations

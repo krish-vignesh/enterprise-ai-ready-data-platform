@@ -22,30 +22,21 @@ class UploadAttemptRepository:
         self.session = session
 
     async def get_by_id(
-        self,
-        upload_attempt_id: UUID,
+            self,
+            upload_attempt_id: UUID,
+            *,
+            for_update: bool = False,
     ) -> UploadAttempt | None:
-        """Return an upload attempt by UUID, or None if not found."""
-        try:
-            upload_attempt = await self.session.get(
+        """Get an upload attempt by ID, optionally locking its database row."""
+        if for_update:
+            return await self.session.get(
                 UploadAttempt,
                 upload_attempt_id,
+                with_for_update=True,
+                populate_existing=True
             )
 
-            logger.debug(
-                "repository.upload_attempt.get_by_id completed "
-                "upload_attempt_id=%s found=%s",
-                upload_attempt_id,
-                upload_attempt is not None,
-            )
-            return upload_attempt
-
-        except Exception:
-            logger.exception(
-                "repository.upload_attempt.get_by_id failed upload_attempt_id=%s",
-                upload_attempt_id,
-            )
-            raise
+        return await self.session.get(UploadAttempt, upload_attempt_id)
 
     async def update_status(
         self,

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from typing import Literal
 
@@ -50,7 +50,9 @@ def read_silver_delta(spark: SparkSession, table_path: str) -> DataFrame:
     if spark is None:
         raise ValueError("SparkSession argument is required and cannot be None.")
     if not isinstance(spark, SparkSession):
-        raise TypeError(f"Expected a PySpark SparkSession, received {type(spark).__name__}.")
+        raise TypeError(
+            f"Expected a PySpark SparkSession, received {type(spark).__name__}."
+        )
     if not isinstance(table_path, str) or not table_path.strip():
         raise ValueError("table_path is required and must be a non-empty string.")
 
@@ -68,7 +70,9 @@ def table_exists(spark: SparkSession, table_path: str) -> bool:
     if spark is None:
         raise ValueError("SparkSession argument is required and cannot be None.")
     if not isinstance(spark, SparkSession):
-        raise TypeError(f"Expected a PySpark SparkSession, received {type(spark).__name__}.")
+        raise TypeError(
+            f"Expected a PySpark SparkSession, received {type(spark).__name__}."
+        )
     if not isinstance(table_path, str) or not table_path.strip():
         raise ValueError("table_path is required and must be a non-empty string.")
 

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from dataclasses import dataclass, field
 
@@ -49,11 +49,17 @@ def generate_quality_report(profile: DatasetProfile) -> DatasetQualityReport:
     if profile is None:
         raise ValueError("DatasetProfile argument is required and cannot be None.")
     if not isinstance(profile, DatasetProfile):
-        raise TypeError(f"Expected a DatasetProfile, received {type(profile).__name__}.")
+        raise TypeError(
+            f"Expected a DatasetProfile, received {type(profile).__name__}."
+        )
 
-    columns = [_column_quality_report(column_profile) for column_profile in profile.columns]
+    columns = [
+        _column_quality_report(column_profile) for column_profile in profile.columns
+    ]
 
-    if profile.exact_duplicate_row_count > 0 or any(column.null_count > 0 for column in profile.columns):
+    if profile.exact_duplicate_row_count > 0 or any(
+        column.null_count > 0 for column in profile.columns
+    ):
         overall_status = "REVIEW"
     else:
         overall_status = "PASS"

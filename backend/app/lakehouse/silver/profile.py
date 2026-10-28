@@ -61,11 +61,11 @@ def _duplicate_row_count(dataframe: DataFrame, row_count: int | None = None) -> 
         return max(row_count - 1, 0)
 
     duplicate_groups = (
-        dataframe.groupBy(*dataframe.columns)
-        .count()
-        .filter(F.col("count") > 1)
+        dataframe.groupBy(*dataframe.columns).count().filter(F.col("count") > 1)
     )
-    duplicate_rows = duplicate_groups.agg(F.sum(F.col("count") - 1).cast("long").alias("duplicate_rows"))
+    duplicate_rows = duplicate_groups.agg(
+        F.sum(F.col("count") - 1).cast("long").alias("duplicate_rows")
+    )
     value = duplicate_rows.collect()[0][0]
     return int(value or 0)
 
@@ -79,9 +79,13 @@ def _profile_column_aggregates(dataframe: DataFrame) -> dict[str, tuple[int, int
     aggregates: list[Any] = []
     for column_name in dataframe.columns:
         aggregates.append(
-            F.sum(F.when(F.col(column_name).isNull(), 1).otherwise(0)).alias(f"{column_name}_null_count")
+            F.sum(F.when(F.col(column_name).isNull(), 1).otherwise(0)).alias(
+                f"{column_name}_null_count"
+            )
         )
-        aggregates.append(F.countDistinct(F.col(column_name)).alias(f"{column_name}_distinct_count"))
+        aggregates.append(
+            F.countDistinct(F.col(column_name)).alias(f"{column_name}_distinct_count")
+        )
 
     row = dataframe.agg(*aggregates).collect()[0]
     result: dict[str, tuple[int, int]] = {}
@@ -92,7 +96,9 @@ def _profile_column_aggregates(dataframe: DataFrame) -> dict[str, tuple[int, int
     return result
 
 
-def _profile_numeric_metrics(dataframe: DataFrame) -> dict[str, dict[str, int | float | Decimal | None]]:
+def _profile_numeric_metrics(
+    dataframe: DataFrame,
+) -> dict[str, dict[str, int | float | Decimal | None]]:
     """Compute min/max/mean for applicable numeric columns."""
 
     numeric_columns = _numeric_column_names(dataframe)
@@ -126,18 +132,24 @@ def profile_dataframe(dataframe: DataFrame) -> DatasetProfile:
     if dataframe is None:
         raise ValueError("DataFrame argument is required and cannot be None.")
     if not isinstance(dataframe, DataFrame):
-        raise TypeError(f"Expected a PySpark DataFrame, received {type(dataframe).__name__}.")
+        raise TypeError(
+            f"Expected a PySpark DataFrame, received {type(dataframe).__name__}."
+        )
 
     try:
         row_count = int(dataframe.count())
     except Exception as exc:
-        raise RuntimeError("Failed to calculate dataset-level metrics for the provided PySpark DataFrame.") from exc
+        raise RuntimeError(
+            "Failed to calculate dataset-level metrics for the provided PySpark DataFrame."
+        ) from exc
 
     try:
         column_count = len(dataframe.columns)
         exact_duplicate_row_count = _duplicate_row_count(dataframe, row_count=row_count)
     except Exception as exc:
-        raise RuntimeError("Failed to calculate duplicate-row count for the provided PySpark DataFrame.") from exc
+        raise RuntimeError(
+            "Failed to calculate duplicate-row count for the provided PySpark DataFrame."
+        ) from exc
 
     try:
         column_profiles: list[ColumnProfile] = []
@@ -145,10 +157,14 @@ def profile_dataframe(dataframe: DataFrame) -> DatasetProfile:
         numeric_metrics = _profile_numeric_metrics(dataframe)
 
         for column_name in dataframe.columns:
-            field = next(field for field in dataframe.schema.fields if field.name == column_name)
+            field = next(
+                field for field in dataframe.schema.fields if field.name == column_name
+            )
             data_type = str(field.dataType)
             nullable = bool(field.nullable)
-            null_count, distinct_count = column_null_and_distinct.get(column_name, (0, 0))
+            null_count, distinct_count = column_null_and_distinct.get(
+                column_name, (0, 0)
+            )
             null_percentage = (null_count / row_count) if row_count else 0.0
 
             metric_values = numeric_metrics.get(column_name, {})
@@ -173,7 +189,9 @@ def profile_dataframe(dataframe: DataFrame) -> DatasetProfile:
             columns=column_profiles,
         )
     except Exception as exc:
-        raise RuntimeError("Failed to calculate column statistics for the provided PySpark DataFrame.") from exc
+        raise RuntimeError(
+            "Failed to calculate column statistics for the provided PySpark DataFrame."
+        ) from exc
 
 
 __all__ = [

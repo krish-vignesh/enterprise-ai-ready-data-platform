@@ -1,4 +1,3 @@
-
 """Tests for the file hashing utility."""
 
 from io import BytesIO

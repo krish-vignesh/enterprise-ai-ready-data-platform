@@ -7,8 +7,7 @@ def transform_customer_data(df):
         "spending_category",
         F.when(F.col("total_spend") < 3000, "Low")
         .when(
-            (F.col("total_spend") >= 3000)
-            & (F.col("total_spend") <= 6000),
+            (F.col("total_spend") >= 3000) & (F.col("total_spend") <= 6000),
             "Medium",
         )
         .when(F.col("total_spend") > 6000, "High")

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from dataclasses import dataclass
 
@@ -8,7 +8,10 @@ from backend.app.lakehouse.bronze.delta import read_bronze_delta
 from backend.app.lakehouse.silver.cleaning import clean_dataframe
 from backend.app.lakehouse.silver.delta import WriteMode, write_silver_delta
 from backend.app.lakehouse.silver.profile import DatasetProfile, profile_dataframe
-from backend.app.lakehouse.silver.report import DatasetQualityReport, generate_quality_report
+from backend.app.lakehouse.silver.report import (
+    DatasetQualityReport,
+    generate_quality_report,
+)
 
 
 @dataclass(frozen=True)
@@ -39,45 +42,67 @@ def run_silver_pipeline(
     if spark is None:
         raise ValueError("SparkSession argument is required and cannot be None.")
     if not isinstance(spark, SparkSession):
-        raise TypeError(f"Expected a PySpark SparkSession, received {type(spark).__name__}.")
+        raise TypeError(
+            f"Expected a PySpark SparkSession, received {type(spark).__name__}."
+        )
 
     if not isinstance(bronze_table_path, str) or not bronze_table_path.strip():
-        raise ValueError("bronze_table_path is required and must be a non-empty string.")
+        raise ValueError(
+            "bronze_table_path is required and must be a non-empty string."
+        )
     if not isinstance(silver_table_path, str) or not silver_table_path.strip():
-        raise ValueError("silver_table_path is required and must be a non-empty string.")
-    if dataset_name is not None and (not isinstance(dataset_name, str) or not dataset_name.strip()):
+        raise ValueError(
+            "silver_table_path is required and must be a non-empty string."
+        )
+    if dataset_name is not None and (
+        not isinstance(dataset_name, str) or not dataset_name.strip()
+    ):
         raise ValueError("dataset_name must be a non-empty string when provided.")
 
-    effective_dataset_name = dataset_name.strip() if dataset_name is not None else "unknown"
+    effective_dataset_name = (
+        dataset_name.strip() if dataset_name is not None else "unknown"
+    )
 
     try:
         bronze_df = read_bronze_delta(spark, bronze_table_path)
     except Exception as exc:
-        raise RuntimeError("Failed to read Bronze Delta table for the Silver pipeline.") from exc
+        raise RuntimeError(
+            "Failed to read Bronze Delta table for the Silver pipeline."
+        ) from exc
 
     try:
         profile = profile_dataframe(bronze_df)
     except Exception as exc:
-        raise RuntimeError("Failed to profile the Bronze DataFrame for the Silver pipeline.") from exc
+        raise RuntimeError(
+            "Failed to profile the Bronze DataFrame for the Silver pipeline."
+        ) from exc
 
     try:
         report = generate_quality_report(profile)
     except Exception as exc:
-        raise RuntimeError("Failed to generate the Silver quality report for the Bronze DataFrame.") from exc
+        raise RuntimeError(
+            "Failed to generate the Silver quality report for the Bronze DataFrame."
+        ) from exc
 
     try:
         cleaned_df = clean_dataframe(bronze_df)
     except Exception as exc:
-        raise RuntimeError("Failed to clean the Bronze DataFrame in the Silver pipeline.") from exc
+        raise RuntimeError(
+            "Failed to clean the Bronze DataFrame in the Silver pipeline."
+        ) from exc
 
     input_row_count = profile.row_count
     output_row_count = int(cleaned_df.count())
     duplicate_rows_removed = input_row_count - output_row_count
 
     try:
-        write_silver_delta(cleaned_df, silver_table_path, mode=mode, partition_by=partition_by)
+        write_silver_delta(
+            cleaned_df, silver_table_path, mode=mode, partition_by=partition_by
+        )
     except Exception as exc:
-        raise RuntimeError("Failed to write the cleaned DataFrame to the Silver Delta table.") from exc
+        raise RuntimeError(
+            "Failed to write the cleaned DataFrame to the Silver Delta table."
+        ) from exc
 
     return SilverPipelineResult(
         dataset_name=effective_dataset_name,

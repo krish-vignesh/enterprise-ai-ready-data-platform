@@ -1,4 +1,3 @@
-
 """Central registration point for platform ORM models."""
 
 from app.models.company import Company

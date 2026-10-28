@@ -10,23 +10,27 @@ from app.spark.session import create_spark_session
 
 PROCESSING_STATE_TABLE_PATH = "s3a://ai-data/processing/state/"
 
-PROCESSING_STATE_SCHEMA = StructType([
-    StructField("dataset_name", StringType(), nullable=False),
-    StructField("company_id", StringType(), nullable=True),
-    StructField("source_id", StringType(), nullable=True),
-    StructField("last_successful_ingestion_id", StringType(), nullable=True),
-    StructField("last_successful_file_hash", StringType(), nullable=True),
-    StructField("last_successful_source_object_path", StringType(), nullable=True),
-    StructField("last_successful_ingested_at", TimestampType(), nullable=True),
-    StructField("updated_at", TimestampType(), nullable=False),
-])
+PROCESSING_STATE_SCHEMA = StructType(
+    [
+        StructField("dataset_name", StringType(), nullable=False),
+        StructField("company_id", StringType(), nullable=True),
+        StructField("source_id", StringType(), nullable=True),
+        StructField("last_successful_ingestion_id", StringType(), nullable=True),
+        StructField("last_successful_file_hash", StringType(), nullable=True),
+        StructField("last_successful_source_object_path", StringType(), nullable=True),
+        StructField("last_successful_ingested_at", TimestampType(), nullable=True),
+        StructField("updated_at", TimestampType(), nullable=False),
+    ]
+)
 
 
 def _coerce_spark_session(spark: SparkSession | None) -> SparkSession:
     if spark is None:
         return create_spark_session()
     if not isinstance(spark, SparkSession):
-        raise TypeError(f"Expected a PySpark SparkSession, received {type(spark).__name__}.")
+        raise TypeError(
+            f"Expected a PySpark SparkSession, received {type(spark).__name__}."
+        )
     return spark
 
 
@@ -50,13 +54,11 @@ def _processing_state_to_row(state: ProcessingState) -> dict[str, object]:
 
 def _state_scope_match(existing_df, incoming_df):
     dataset_match = F.col("existing.dataset_name") == F.col("incoming.dataset_name")
-    company_match = (
-        (F.col("existing.company_id") == F.col("incoming.company_id"))
-        | (F.col("existing.company_id").isNull() & F.col("incoming.company_id").isNull())
+    company_match = (F.col("existing.company_id") == F.col("incoming.company_id")) | (
+        F.col("existing.company_id").isNull() & F.col("incoming.company_id").isNull()
     )
-    source_match = (
-        (F.col("existing.source_id") == F.col("incoming.source_id"))
-        | (F.col("existing.source_id").isNull() & F.col("incoming.source_id").isNull())
+    source_match = (F.col("existing.source_id") == F.col("incoming.source_id")) | (
+        F.col("existing.source_id").isNull() & F.col("incoming.source_id").isNull()
     )
     return dataset_match & company_match & source_match
 
@@ -67,7 +69,11 @@ def _table_missing_error(exc: Exception) -> bool:
         "path does not exist" in message
         or "no such file" in message
         or "table or view not found" in message
-        or ("analysisexception" in message and "path" in message and "does not exist" in message)
+        or (
+            "analysisexception" in message
+            and "path" in message
+            and "does not exist" in message
+        )
     )
 
 
@@ -99,7 +105,9 @@ def write_processing_state(
         delta_table = DeltaTable.forPath(resolved_spark, table_path)
         delta_table.alias("existing").merge(
             incoming_df.alias("incoming"),
-            _state_scope_match(existing_df.alias("existing"), incoming_df.alias("incoming")),
+            _state_scope_match(
+                existing_df.alias("existing"), incoming_df.alias("incoming")
+            ),
         ).whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
     except Exception as exc:
         raise RuntimeError(
@@ -118,9 +126,13 @@ def read_processing_state(
     """Read the last persisted ProcessingState for a dataset scope, if any."""
     if not isinstance(dataset_name, str) or not dataset_name.strip():
         raise ValueError("dataset_name is required and must be a non-empty string.")
-    if company_id is not None and (not isinstance(company_id, str) or not company_id.strip()):
+    if company_id is not None and (
+        not isinstance(company_id, str) or not company_id.strip()
+    ):
         raise ValueError("company_id must be a non-empty string when provided.")
-    if source_id is not None and (not isinstance(source_id, str) or not source_id.strip()):
+    if source_id is not None and (
+        not isinstance(source_id, str) or not source_id.strip()
+    ):
         raise ValueError("source_id must be a non-empty string when provided.")
     if not isinstance(table_path, str) or not table_path.strip():
         raise ValueError("table_path is required and must be a non-empty string.")

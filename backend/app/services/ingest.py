@@ -14,11 +14,11 @@ from app.spark.session import create_spark_session
 from app.storage.ingest import save_data, save_file
 
 
-def ingest_data(request): #Service travel in the route to storage
+def ingest_data(request):  # Service travel in the route to storage
     file_path = save_data(request)
     return {
         "status": "completed",
-        "message": f"Data {request.dataset}ingestion completed successfully"
+        "message": f"Data {request.dataset}ingestion completed successfully",
     }
 
 
@@ -27,7 +27,7 @@ def ingest_file_data(metadata, file):
 
     return {
         "status": "completed",
-        "message": f"File {metadata.dataset} ingestion completed successfully"
+        "message": f"File {metadata.dataset} ingestion completed successfully",
     }
 
 
@@ -65,13 +65,17 @@ def process_source_artifact(
     if not isinstance(source_format, str) or not source_format.strip():
         raise ValueError("source_format is required and must be a non-empty string.")
     if not isinstance(source_object_path, str) or not source_object_path.strip():
-        raise ValueError("source_object_path is required and must be a non-empty string.")
+        raise ValueError(
+            "source_object_path is required and must be a non-empty string."
+        )
     if file_size is None:
         raise ValueError("file_size is required before processing an artifact.")
     if not isinstance(file_hash, str) or not file_hash.strip():
         raise ValueError("file_hash is required and must be a non-empty string.")
     if silver_table_path is None or not str(silver_table_path).strip():
-        raise ValueError("silver_table_path is required and must be a non-empty string.")
+        raise ValueError(
+            "silver_table_path is required and must be a non-empty string."
+        )
 
     resolved_spark = spark if spark is not None else create_spark_session()
 
@@ -112,7 +116,9 @@ def process_source_artifact(
     )
 
     if bronze_result.get("status") != "success":
-        raise RuntimeError(f"Bronze ingestion did not finish successfully for dataset '{dataset_name}'.")
+        raise RuntimeError(
+            f"Bronze ingestion did not finish successfully for dataset '{dataset_name}'."
+        )
 
     silver_result = run_silver_pipeline(
         spark=resolved_spark,

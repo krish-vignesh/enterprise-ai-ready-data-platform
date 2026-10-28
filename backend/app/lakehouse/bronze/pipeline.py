@@ -14,7 +14,9 @@ from app.spark.io.reader import read_data
 from app.spark.session import create_spark_session
 
 
-def _build_bronze_table_path(dataset_name: str, bronze_table_root: str = "s3a://ai-data/bronze/tables") -> str:
+def _build_bronze_table_path(
+    dataset_name: str, bronze_table_root: str = "s3a://ai-data/bronze/tables"
+) -> str:
     """Return the dataset-level Bronze Delta path for a logical dataset."""
     cleaned_name = dataset_name.strip("/")
     return f"{bronze_table_root.rstrip('/')}/{cleaned_name}/"
@@ -44,10 +46,15 @@ def _validate_source_artifact(source_artifact: SourceArtifact) -> None:
         "source_object_path": source_artifact.source_object_path,
     }
 
-    missing = [name for name, value in required_fields.items() if value is None or str(value).strip() == ""]
+    missing = [
+        name
+        for name, value in required_fields.items()
+        if value is None or str(value).strip() == ""
+    ]
     if missing:
         raise ValueError(
-            "Missing required source metadata for Bronze ingestion: " + ", ".join(missing)
+            "Missing required source metadata for Bronze ingestion: "
+            + ", ".join(missing)
         )
 
 
@@ -91,13 +98,21 @@ def run_bronze_ingestion(
     _validate_source_artifact(source_artifact)
 
     if file_size is None:
-        raise ValueError("file_size is required upstream metadata for Bronze ingestion.")
+        raise ValueError(
+            "file_size is required upstream metadata for Bronze ingestion."
+        )
     if file_hash is None or str(file_hash).strip() == "":
-        raise ValueError("file_hash is required upstream metadata for Bronze ingestion.")
+        raise ValueError(
+            "file_hash is required upstream metadata for Bronze ingestion."
+        )
 
     resolved_ingestion_id = ingestion_id or str(uuid4())
-    resolved_bronze_table_path = bronze_table_path or _build_bronze_table_path(dataset_name, bronze_table_root)
-    resolved_file_name = source_file_name or str(Path(source_object_path.rstrip("/")).name or "source-file")
+    resolved_bronze_table_path = bronze_table_path or _build_bronze_table_path(
+        dataset_name, bronze_table_root
+    )
+    resolved_file_name = source_file_name or str(
+        Path(source_object_path.rstrip("/")).name or "source-file"
+    )
 
     metadata = BronzeIngestionMetadata(
         ingestion_id=resolved_ingestion_id,
@@ -121,7 +136,9 @@ def run_bronze_ingestion(
 
     try:
         if df is None:
-            df = read_data(spark, source_object_path, source_format, options=read_options)
+            df = read_data(
+                spark, source_object_path, source_format, options=read_options
+            )
 
         metadata.schema = _schema_to_metadata(df)
         write_bronze_delta(df, resolved_bronze_table_path, mode=mode)

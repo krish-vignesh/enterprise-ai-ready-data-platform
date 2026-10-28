@@ -3,17 +3,9 @@ import time
 
 
 def main():
-    spark = (
-        SparkSession.builder
-        .appName("Spark Partition Experiment")
-        .getOrCreate()
-    )
+    spark = SparkSession.builder.appName("Spark Partition Experiment").getOrCreate()
 
-    input_path = (
-        "s3a://ai-data/"
-        "spark_scaling_customers/"
-        "spark_scaling_customers.jsonl"
-    )
+    input_path = "s3a://ai-data/spark_scaling_customers/spark_scaling_customers.jsonl"
 
     print("\n========== SPARK PARTITION EXPERIMENT ==========")
     print("Max partition bytes:", spark.conf.get("spark.sql.files.maxPartitionBytes"))

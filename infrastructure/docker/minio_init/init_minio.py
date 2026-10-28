@@ -44,10 +44,7 @@ def create_bucket() -> None:
             return
 
         except Exception as exc:
-            print(
-                f"MinIO not ready "
-                f"(attempt {attempt}/{MAX_RETRIES}): {exc}"
-            )
+            print(f"MinIO not ready (attempt {attempt}/{MAX_RETRIES}): {exc}")
 
             if attempt == MAX_RETRIES:
                 raise

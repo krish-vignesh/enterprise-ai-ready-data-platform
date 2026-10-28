@@ -1,4 +1,3 @@
-
 """Document entity for the platform catalog."""
 
 from uuid import UUID

@@ -1,4 +1,3 @@
-
 """Enumerations used by the platform's database models."""
 
 from enum import Enum

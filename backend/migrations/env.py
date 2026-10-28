@@ -1,4 +1,3 @@
-
 """Alembic migration environment for the platform."""
 
 from logging.config import fileConfig

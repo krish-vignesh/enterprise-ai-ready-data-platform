@@ -1,4 +1,3 @@
-
 """Unit tests for SourceSystemRepository using a mocked AsyncSession."""
 
 from unittest.mock import MagicMock

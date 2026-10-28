@@ -9,7 +9,10 @@ BACKEND = ROOT / "backend"
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
-from app.processing.execution.decision import ProcessingDecision, should_process_incremental
+from app.processing.execution.decision import (
+    ProcessingDecision,
+    should_process_incremental,
+)
 from app.processing.state.models import ProcessingState
 
 

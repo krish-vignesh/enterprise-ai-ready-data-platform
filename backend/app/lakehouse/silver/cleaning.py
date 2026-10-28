@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from pyspark.sql import DataFrame
 
@@ -9,7 +9,9 @@ def clean_dataframe(dataframe: DataFrame) -> DataFrame:
     if dataframe is None:
         raise ValueError("DataFrame argument is required and cannot be None.")
     if not isinstance(dataframe, DataFrame):
-        raise TypeError(f"Expected a PySpark DataFrame, received {type(dataframe).__name__}.")
+        raise TypeError(
+            f"Expected a PySpark DataFrame, received {type(dataframe).__name__}."
+        )
 
     try:
         # A zero-column DataFrame has no duplicate row definition to compare, so it is

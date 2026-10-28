@@ -109,7 +109,9 @@ def test_repositories_persist_and_join_data():
                 dataset_repo.add(dataset)
                 await session.flush()
                 assert (
-                    await dataset_repo.get_by_source_and_name(source.source_id, "customers")
+                    await dataset_repo.get_by_source_and_name(
+                        source.source_id, "customers"
+                    )
                 ) == dataset
 
                 document = Document(
@@ -124,7 +126,9 @@ def test_repositories_persist_and_join_data():
                 document_repo.add(document)
                 await session.flush()
                 assert (
-                    await document_repo.get_by_dataset_and_sha256(dataset.dataset_id, "a" * 64)
+                    await document_repo.get_by_dataset_and_sha256(
+                        dataset.dataset_id, "a" * 64
+                    )
                 ) == document
 
                 storage_object = StorageObject(
@@ -154,7 +158,12 @@ def test_repositories_persist_and_join_data():
                         1,
                     )
                 ) == attempt
-                assert await upload_attempt_repo.get_latest_by_document(document.document_id) == attempt
+                assert (
+                    await upload_attempt_repo.get_latest_by_document(
+                        document.document_id
+                    )
+                    == attempt
+                )
 
                 second_company = Company(company_name="Other Company")
                 company_repo.add(second_company)
@@ -195,7 +204,9 @@ def test_repositories_persist_and_join_data():
                 storage_repo.add(second_storage)
                 await session.flush()
 
-                company_objects = await storage_repo.list_by_company(company.company_id, limit=10)
+                company_objects = await storage_repo.list_by_company(
+                    company.company_id, limit=10
+                )
                 assert [obj.storage_object_id for obj in company_objects] == [
                     storage_object.storage_object_id
                 ]
@@ -250,7 +261,9 @@ def test_database_enforces_constraints():
                 await session.flush()
 
                 with pytest.raises(IntegrityError):
-                    session.add(Dataset(source_id=source.source_id, dataset_name="accounts"))
+                    session.add(
+                        Dataset(source_id=source.source_id, dataset_name="accounts")
+                    )
                     await session.flush()
                 await session.rollback()
 

@@ -34,8 +34,12 @@ def fetch_object_metadata(bucket_name: str, object_name: str) -> tuple[int, str]
 def delta_log_exists(spark, table_path: str) -> bool:
     """Check whether the Delta transaction log directory exists at the target S3A path."""
     table_uri = spark._jvm.java.net.URI.create(table_path.rstrip("/"))
-    fs = spark._jvm.org.apache.hadoop.fs.FileSystem.get(table_uri, spark._jsc.hadoopConfiguration())
-    delta_log_path = spark._jvm.org.apache.hadoop.fs.Path(f"{table_path.rstrip('/')}/_delta_log")
+    fs = spark._jvm.org.apache.hadoop.fs.FileSystem.get(
+        table_uri, spark._jsc.hadoopConfiguration()
+    )
+    delta_log_path = spark._jvm.org.apache.hadoop.fs.Path(
+        f"{table_path.rstrip('/')}/_delta_log"
+    )
     return bool(fs.exists(delta_log_path))
 
 
@@ -95,8 +99,12 @@ def main() -> None:
         print("Sample rows:")
         bronze_df.show(5, truncate=False)
 
-        checks["Delta read-back"] = read_row_count > 0 and len(bronze_df.schema.fields) > 0
-        checks["row-count consistency"] = (result.get("record_count") == read_row_count) and read_row_count > 0
+        checks["Delta read-back"] = (
+            read_row_count > 0 and len(bronze_df.schema.fields) > 0
+        )
+        checks["row-count consistency"] = (
+            result.get("record_count") == read_row_count
+        ) and read_row_count > 0
         checks["_delta_log existence"] = delta_log_exists(spark, BRONZE_TABLE_PATH)
 
         print("=== PASS/FAIL summary ===")
@@ -105,7 +113,9 @@ def main() -> None:
 
         if not all(checks.values()):
             failures = [name for name, ok in checks.items() if not ok]
-            raise RuntimeError(f"Bronze integration test failed for: {', '.join(failures)}")
+            raise RuntimeError(
+                f"Bronze integration test failed for: {', '.join(failures)}"
+            )
 
         print("PASS: Bronze integration test succeeded.")
     finally:
