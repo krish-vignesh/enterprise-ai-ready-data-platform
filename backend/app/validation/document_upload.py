@@ -79,9 +79,9 @@ def validate_document_upload_metadata(
     if (
         isinstance(file_size_bytes, bool)
         or not isinstance(file_size_bytes, int)
-        or file_size_bytes < 0
+        or file_size_bytes <= 0
     ):
-        raise InvalidDocumentSizeError("File size must be a non-negative integer.")
+        raise InvalidDocumentSizeError("File size must be a positive integer.")
 
     if (
         isinstance(max_file_size_bytes, bool)

@@ -78,9 +78,9 @@ def test_file_over_limit_is_rejected() -> None:
         )
 
 
-def test_zero_byte_file_is_allowed_by_metadata_validation() -> None:
-    validate_document_upload_metadata("empty.txt", 0)
-
+def test_zero_byte_file_is_rejected_by_metadata_validation() -> None:
+    with pytest.raises(InvalidDocumentSizeError):
+        validate_document_upload_metadata("empty.txt", 0)
 
 @pytest.mark.parametrize("size", [-1, 1.5, True])
 def test_invalid_file_size_is_rejected(size: object) -> None:

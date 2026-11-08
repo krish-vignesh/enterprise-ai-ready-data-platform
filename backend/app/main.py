@@ -1,11 +1,22 @@
+
+"""Application entry point."""
+
 from fastapi import FastAPI
-from app.api.ingest import router
+
+from app.api.documents import router as documents_router
+from app.api.ingest import router as ingest_router
 from app.config.settings import settings
+from app.middleware.request_id import RequestIDMiddleware
+
 
 app = FastAPI()
-app.include_router(router)  # Adding the route to app via router
 
+app.add_middleware(RequestIDMiddleware)
+
+# New document upload API.
+app.include_router(documents_router)
+
+# Legacy ingestion routes retained temporarily.
+app.include_router(ingest_router)
 
 print(settings.app_name)
-
-# this file is the entry point of the application, where we create an instance of the FastAPI class and include the router that defines the API endpoints. The settings are also printed to verify that they are loaded correctly from the .env file.
