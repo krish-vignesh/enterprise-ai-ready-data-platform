@@ -29,5 +29,15 @@ class Settings(BaseSettings):
         gt=0,
     )
 
+    max_batch_upload_files: int = Field(
+        default=10,
+        gt=0,
+    )
+
+    max_batch_upload_size_bytes: int = Field(
+        default=100 * 1024 * 1024,
+        gt=0,
+    )
+
 
 settings = Settings()

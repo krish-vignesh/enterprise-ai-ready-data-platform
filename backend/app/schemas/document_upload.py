@@ -20,7 +20,7 @@ class DocumentResponse(BaseModel):
     original_filename: str
     detected_format: str
     content_type: str | None
-    file_size_bytes: int = Field(ge=0)
+    file_size_bytes: int = Field(ge=1)
     sha256: str
     status: DocumentStatus
 
@@ -37,6 +37,7 @@ class BatchDocumentUploadItemResponse(BaseModel):
     """Represent the outcome of one file in a batch upload."""
 
     filename: str
+    file_index: int = Field(ge=1)
     outcome: DocumentUploadOutcome | Literal["FAILED"]
     document: DocumentResponse | None = None
     upload_attempt_id: UUID | None = None
