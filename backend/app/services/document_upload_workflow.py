@@ -64,12 +64,9 @@ def _result_from_reservation(
     """Return immediately when the reservation needs no new upload."""
 
     outcome_by_disposition = {
-        ReservationDisposition.ALREADY_AVAILABLE:
-            DocumentUploadOutcome.ALREADY_AVAILABLE,
-        ReservationDisposition.UPLOAD_IN_PROGRESS:
-            DocumentUploadOutcome.UPLOAD_IN_PROGRESS,
-        ReservationDisposition.RECONCILIATION_REQUIRED:
-            DocumentUploadOutcome.RECONCILIATION_REQUIRED,
+        ReservationDisposition.ALREADY_AVAILABLE: DocumentUploadOutcome.ALREADY_AVAILABLE,
+        ReservationDisposition.UPLOAD_IN_PROGRESS: DocumentUploadOutcome.UPLOAD_IN_PROGRESS,
+        ReservationDisposition.RECONCILIATION_REQUIRED: DocumentUploadOutcome.RECONCILIATION_REQUIRED,
     }
 
     outcome = outcome_by_disposition.get(reservation.disposition)
@@ -296,9 +293,7 @@ async def upload_document(
                 document.status != DocumentStatus.UPLOADING
                 or attempt.status != UploadAttemptStatus.IN_PROGRESS
             ):
-                raise RuntimeError(
-                    "The upload state changed before finalization."
-                )
+                raise RuntimeError("The upload state changed before finalization.")
 
             storage_object = await storage_repository.get_by_bucket_and_key(
                 stored_metadata.bucket_name,
@@ -357,22 +352,19 @@ async def upload_document(
 
     except Exception as exc:
         logger.exception(
-            "document_upload.finalization_failed document_id=%s "
-            "upload_attempt_id=%s",
+            "document_upload.finalization_failed document_id=%s upload_attempt_id=%s",
             document_id,
             attempt_id,
         )
 
         # The database may have committed even if the client saw an error.
         try:
-            finalized, document, attempt, persisted_object = (
-                await _is_upload_finalized(
-                    session_factory,
-                    document_id=document_id,
-                    upload_attempt_id=attempt_id,
-                    bucket_name=stored_metadata.bucket_name,
-                    object_key=stored_metadata.object_key,
-                )
+            finalized, document, attempt, persisted_object = await _is_upload_finalized(
+                session_factory,
+                document_id=document_id,
+                upload_attempt_id=attempt_id,
+                bucket_name=stored_metadata.bucket_name,
+                object_key=stored_metadata.object_key,
             )
 
             if finalized and document is not None and attempt is not None:

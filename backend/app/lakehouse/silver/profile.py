@@ -43,9 +43,9 @@ def _numeric_column_names(dataframe: DataFrame) -> list[str]:
     """List columns whose Spark schema type is numeric."""
 
     numeric_columns: list[str] = []
-    for field in dataframe.schema.fields:
-        if _is_numeric_type(field.dataType):
-            numeric_columns.append(field.name)
+    for schema_field in dataframe.schema.fields:
+        if _is_numeric_type(schema_field.dataType):
+            numeric_columns.append(schema_field.name)
     return numeric_columns
 
 
@@ -157,11 +157,11 @@ def profile_dataframe(dataframe: DataFrame) -> DatasetProfile:
         numeric_metrics = _profile_numeric_metrics(dataframe)
 
         for column_name in dataframe.columns:
-            field = next(
+            schema_field = next(
                 field for field in dataframe.schema.fields if field.name == column_name
             )
-            data_type = str(field.dataType)
-            nullable = bool(field.nullable)
+            data_type = str(schema_field.dataType)
+            nullable = bool(schema_field.nullable)
             null_count, distinct_count = column_null_and_distinct.get(
                 column_name, (0, 0)
             )

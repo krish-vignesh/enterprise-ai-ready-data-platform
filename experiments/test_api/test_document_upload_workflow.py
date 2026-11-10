@@ -266,10 +266,7 @@ async def test_storage_failure_requests_reconciliation():
     reconciliation_mock.assert_awaited_once()
 
     assert reconciliation_mock.await_args.args[0] is session_factory
-    assert (
-        reconciliation_mock.await_args.kwargs["document_id"]
-        == document.document_id
-    )
+    assert reconciliation_mock.await_args.kwargs["document_id"] == document.document_id
     assert (
         reconciliation_mock.await_args.kwargs["upload_attempt_id"]
         == attempt.upload_attempt_id

@@ -1,4 +1,3 @@
-
 """Store and verify original document files in MinIO."""
 
 import asyncio

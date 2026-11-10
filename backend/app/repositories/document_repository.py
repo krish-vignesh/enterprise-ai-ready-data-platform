@@ -21,28 +21,25 @@ class DocumentRepository:
         self.session = session
 
     async def get_by_id(
-            self,
-            document_id: UUID,
-            *,
-            for_update: bool = False,
+        self,
+        document_id: UUID,
+        *,
+        for_update: bool = False,
     ) -> Document | None:
         """Get a document by ID, optionally locking its database row."""
         if for_update:
             return await self.session.get(
-                Document,
-                document_id,
-                with_for_update=True,
-                populate_existing=True
+                Document, document_id, with_for_update=True, populate_existing=True
             )
 
         return await self.session.get(Document, document_id)
 
     async def get_by_dataset_and_sha256(
-            self,
-            dataset_id: UUID,
-            sha256: str,
-            *,
-            for_update: bool = False,
+        self,
+        dataset_id: UUID,
+        sha256: str,
+        *,
+        for_update: bool = False,
     ) -> Document | None:
         """Return a document matching a dataset and SHA-256 hash.
 
@@ -71,8 +68,7 @@ class DocumentRepository:
 
         except Exception:
             logger.exception(
-                "repository.document.get_by_dataset_and_sha256 failed "
-                "dataset_id=%s",
+                "repository.document.get_by_dataset_and_sha256 failed dataset_id=%s",
                 dataset_id,
             )
             raise

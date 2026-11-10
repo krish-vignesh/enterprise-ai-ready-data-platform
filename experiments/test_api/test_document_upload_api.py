@@ -1,4 +1,3 @@
-
 """API tests for single-document uploads."""
 
 from types import SimpleNamespace
@@ -113,11 +112,10 @@ def test_successful_single_document_upload(test_client, monkeypatch):
     assert workflow_arguments.kwargs["detected_format"] == "csv"
     assert workflow_arguments.kwargs["content_type"] == "text/csv"
     assert workflow_arguments.kwargs["file_size_bytes"] == len(file_content)
-    assert workflow_arguments.kwargs["sha256"] == hashlib.sha256(
-        file_content
-    ).hexdigest()
+    assert (
+        workflow_arguments.kwargs["sha256"] == hashlib.sha256(file_content).hexdigest()
+    )
     assert workflow_arguments.kwargs["request_id"] == request_id
-
 
 
 def test_already_available_document_returns_200(test_client, monkeypatch):
@@ -264,9 +262,7 @@ def test_finalization_failure_returns_500(test_client, monkeypatch):
     dataset_id = uuid4()
 
     workflow_mock = AsyncMock(
-        side_effect=documents_api.DocumentUploadFinalizationError(
-            "Finalization failed"
-        )
+        side_effect=documents_api.DocumentUploadFinalizationError("Finalization failed")
     )
     monkeypatch.setattr(documents_api, "upload_document", workflow_mock)
 
@@ -333,4 +329,3 @@ def test_oversized_document_returns_413(test_client, monkeypatch):
 
     assert response.status_code == 413
     workflow_mock.assert_not_awaited()
-

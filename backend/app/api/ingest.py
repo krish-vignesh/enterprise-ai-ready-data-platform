@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from app.schemas.ingest import IngestRequest, IngestResponse, IngestFileRequest
 from app.services.ingest import ingest_data, ingest_file_data
-from typing import Annotated
 from fastapi import Form, UploadFile, File
 
 router = (

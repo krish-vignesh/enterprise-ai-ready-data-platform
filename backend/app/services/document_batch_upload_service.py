@@ -1,4 +1,3 @@
-
 """Orchestrate sequential uploads of multiple documents into a dataset."""
 
 import asyncio
@@ -61,8 +60,7 @@ def _build_batch_response(
         DocumentUploadOutcome.UPLOADED: "successful_uploads",
         DocumentUploadOutcome.ALREADY_AVAILABLE: "already_available",
         DocumentUploadOutcome.UPLOAD_IN_PROGRESS: "in_progress",
-        DocumentUploadOutcome.RECONCILIATION_REQUIRED:
-            "reconciliation_required",
+        DocumentUploadOutcome.RECONCILIATION_REQUIRED: "reconciliation_required",
         "FAILED": "failed_uploads",
     }
 
@@ -94,14 +92,11 @@ async def upload_documents_batch(
     # ---------------------------------------------------------
 
     if not files:
-        raise EmptyDocumentBatchError(
-            "At least one file must be provided."
-        )
+        raise EmptyDocumentBatchError("At least one file must be provided.")
 
     if len(files) > settings.max_batch_upload_files:
         raise TooManyDocumentsInBatchError(
-            f"A batch cannot contain more than "
-            f"{settings.max_batch_upload_files} files."
+            f"A batch cannot contain more than {settings.max_batch_upload_files} files."
         )
 
     # ---------------------------------------------------------
@@ -121,9 +116,7 @@ async def upload_documents_batch(
 
         total_size_bytes += file_size_bytes
 
-        measured_files.append(
-            (file_index, file, filename, file_size_bytes)
-        )
+        measured_files.append((file_index, file, filename, file_size_bytes))
 
     if total_size_bytes > settings.max_batch_upload_size_bytes:
         raise DocumentBatchTooLargeError(
@@ -140,9 +133,7 @@ async def upload_documents_batch(
         dataset = await dataset_repository.get_by_id(dataset_id)
 
         if dataset is None:
-            raise DatasetNotFoundError(
-                f"Dataset '{dataset_id}' does not exist."
-            )
+            raise DatasetNotFoundError(f"Dataset '{dataset_id}' does not exist.")
 
     # The preflight transaction has now ended.
     # The existing upload workflow can safely manage its own transactions.
@@ -154,7 +145,6 @@ async def upload_documents_batch(
     results: list[BatchDocumentUploadItemResponse] = []
 
     for file_index, file, filename, file_size_bytes in measured_files:
-
         # 4.1 Validate individual file metadata.
         try:
             validate_document_upload_metadata(
@@ -212,9 +202,7 @@ async def upload_documents_batch(
             continue
 
         # 4.2 Derive format and content type.
-        detected_format = (
-            PurePath(filename).suffix.lower().lstrip(".")
-        )
+        detected_format = PurePath(filename).suffix.lower().lstrip(".")
         content_type = file.content_type
 
         # 4.3 Calculate SHA-256 without blocking the event loop.
@@ -277,9 +265,7 @@ async def upload_documents_batch(
                 file_index=file_index,
                 filename=filename,
                 outcome=upload_result.outcome,
-                document=DocumentResponse.model_validate(
-                    upload_result.document
-                ),
+                document=DocumentResponse.model_validate(upload_result.document),
                 upload_attempt_id=upload_attempt_id,
             )
         )

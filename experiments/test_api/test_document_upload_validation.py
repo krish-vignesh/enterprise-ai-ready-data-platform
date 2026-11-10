@@ -82,6 +82,7 @@ def test_zero_byte_file_is_rejected_by_metadata_validation() -> None:
     with pytest.raises(InvalidDocumentSizeError):
         validate_document_upload_metadata("empty.txt", 0)
 
+
 @pytest.mark.parametrize("size", [-1, 1.5, True])
 def test_invalid_file_size_is_rejected(size: object) -> None:
     with pytest.raises(InvalidDocumentSizeError):

@@ -174,7 +174,6 @@ async def reserve_document_upload(
     document_repository = DocumentRepository(session)
     upload_attempt_repository = UploadAttemptRepository(session)
 
-
     try:
         async with session.begin():
             dataset = await dataset_repository.get_by_id(dataset_id)

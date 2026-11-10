@@ -5,10 +5,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession  # noqa: E402
 
-from backend.app.ingestion.parsers.pdf_tables import extract_pdf_tables
-from backend.app.ingestion.spark_adapter import pandas_to_spark_dataframe
+from backend.app.ingestion.parsers.pdf_tables import extract_pdf_tables  # noqa: E402
+from backend.app.ingestion.spark_adapter import pandas_to_spark_dataframe  # noqa: E402
 
 
 PDF_PATH = REPO_ROOT / "experiments" / "ingestion" / "data" / "sample_customers.pdf"

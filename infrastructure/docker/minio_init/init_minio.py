@@ -2,7 +2,6 @@ import os
 import time
 
 from minio import Minio
-from minio.error import S3Error
 
 
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "minio:9000")

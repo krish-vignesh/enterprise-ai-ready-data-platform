@@ -1,4 +1,3 @@
-
 """Pydantic schemas for document-upload API requests and responses."""
 
 from typing import Literal
@@ -72,8 +71,7 @@ class BatchDocumentUploadResponse(BaseModel):
             DocumentUploadOutcome.UPLOADED: "successful_uploads",
             DocumentUploadOutcome.ALREADY_AVAILABLE: "already_available",
             DocumentUploadOutcome.UPLOAD_IN_PROGRESS: "in_progress",
-            DocumentUploadOutcome.RECONCILIATION_REQUIRED:
-                "reconciliation_required",
+            DocumentUploadOutcome.RECONCILIATION_REQUIRED: "reconciliation_required",
             "FAILED": "failed_uploads",
         }
 
@@ -81,15 +79,11 @@ class BatchDocumentUploadResponse(BaseModel):
             counts[outcome_to_count[result.outcome]] += 1
 
         if self.total_files != len(self.results):
-            raise ValueError(
-                "total_files must match the number of results."
-            )
+            raise ValueError("total_files must match the number of results.")
 
         for field_name, expected_count in counts.items():
             if getattr(self, field_name) != expected_count:
-                raise ValueError(
-                    f"{field_name} does not match the individual results."
-                )
+                raise ValueError(f"{field_name} does not match the individual results.")
 
         return self
 

@@ -88,7 +88,7 @@ def main() -> None:
         notebook_ok = saved_notebook_path == notebook_object_path
         print(f"Notebook save path: {saved_notebook_path}")
     except Exception as exc:  # pragma: no cover - validation script reports failures
-        print(f"Notebook persistence: FAIL")
+        print("Notebook persistence: FAIL")
         print(f"Notebook save error: {exc}")
 
     try:
@@ -96,7 +96,7 @@ def main() -> None:
         metadata_ok = saved_metadata_path == metadata_object_path
         print(f"Metadata save path: {saved_metadata_path}")
     except Exception as exc:  # pragma: no cover - validation script reports failures
-        print(f"Metadata persistence: FAIL")
+        print("Metadata persistence: FAIL")
         print(f"Metadata save error: {exc}")
 
     if notebook_ok:

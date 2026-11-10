@@ -1,11 +1,18 @@
-
 """API routes for document uploads."""
 
 import asyncio
 from pathlib import PurePath
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, HTTPException, Request, Response, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Request,
+    Response,
+    UploadFile,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import settings

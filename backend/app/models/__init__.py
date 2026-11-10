@@ -6,6 +6,8 @@ from app.models.document import Document
 from app.models.source_system import SourceSystem
 from app.models.storage_object import StorageObject
 from app.models.upload_attempt import UploadAttempt
+from app.models.company_membership import CompanyMembership
+from app.models.user import User
 
 __all__ = [
     "Company",
@@ -14,4 +16,6 @@ __all__ = [
     "Document",
     "StorageObject",
     "UploadAttempt",
+    "CompanyMembership",
+    "User",
 ]

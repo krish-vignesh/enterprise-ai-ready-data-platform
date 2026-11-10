@@ -1,4 +1,3 @@
-
 """API routes for batch document uploads."""
 
 from uuid import UUID

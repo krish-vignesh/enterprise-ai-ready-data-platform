@@ -1,4 +1,3 @@
-
 """Tests for document-upload reservation decisions and service orchestration."""
 
 from types import SimpleNamespace
@@ -78,10 +77,7 @@ async def test_reconciliation_required_document_is_blocked(
         request_id=None,
     )
 
-    assert (
-        result.disposition
-        == ReservationDisposition.RECONCILIATION_REQUIRED
-    )
+    assert result.disposition == ReservationDisposition.RECONCILIATION_REQUIRED
     assert result.document is document
     assert result.upload_attempt is None
     upload_attempt_repository.get_latest_by_document.assert_not_awaited()
@@ -97,9 +93,7 @@ async def test_active_upload_is_not_reserved_twice(
         status=UploadAttemptStatus.IN_PROGRESS,
         attempt_number=1,
     )
-    upload_attempt_repository.get_latest_by_document.return_value = (
-        active_attempt
-    )
+    upload_attempt_repository.get_latest_by_document.return_value = active_attempt
 
     result = await _resolve_existing_document(
         document=document,
@@ -125,10 +119,7 @@ async def test_uploading_document_without_active_attempt_requires_reconciliation
         request_id=None,
     )
 
-    assert (
-        result.disposition
-        == ReservationDisposition.RECONCILIATION_REQUIRED
-    )
+    assert result.disposition == ReservationDisposition.RECONCILIATION_REQUIRED
     assert document.status == DocumentStatus.RECONCILIATION_REQUIRED
 
 
@@ -142,9 +133,7 @@ async def test_failed_attempt_can_be_retried(
         attempt_number=2,
         status=UploadAttemptStatus.FAILED,
     )
-    upload_attempt_repository.get_latest_by_document.return_value = (
-        previous_attempt
-    )
+    upload_attempt_repository.get_latest_by_document.return_value = previous_attempt
     upload_attempt_repository.add = MagicMock()
     request_id = "test-request-123"
 
@@ -160,9 +149,7 @@ async def test_failed_attempt_can_be_retried(
     assert result.upload_attempt.attempt_number == 3
     assert result.upload_attempt.request_id == request_id
     assert result.upload_attempt.status == UploadAttemptStatus.IN_PROGRESS
-    upload_attempt_repository.add.assert_called_once_with(
-        result.upload_attempt
-    )
+    upload_attempt_repository.add.assert_called_once_with(result.upload_attempt)
 
 
 @pytest.mark.asyncio
@@ -179,10 +166,7 @@ async def test_failed_document_without_attempt_requires_reconciliation(
         request_id=None,
     )
 
-    assert (
-        result.disposition
-        == ReservationDisposition.RECONCILIATION_REQUIRED
-    )
+    assert result.disposition == ReservationDisposition.RECONCILIATION_REQUIRED
     assert document.status == DocumentStatus.RECONCILIATION_REQUIRED
 
 
@@ -196,9 +180,7 @@ async def test_failed_document_with_nonfailed_attempt_requires_reconciliation(
         attempt_number=1,
         status=UploadAttemptStatus.SUCCEEDED,
     )
-    upload_attempt_repository.get_latest_by_document.return_value = (
-        previous_attempt
-    )
+    upload_attempt_repository.get_latest_by_document.return_value = previous_attempt
 
     result = await _resolve_existing_document(
         document=document,
@@ -206,10 +188,7 @@ async def test_failed_document_with_nonfailed_attempt_requires_reconciliation(
         request_id=None,
     )
 
-    assert (
-        result.disposition
-        == ReservationDisposition.RECONCILIATION_REQUIRED
-    )
+    assert result.disposition == ReservationDisposition.RECONCILIATION_REQUIRED
     assert document.status == DocumentStatus.RECONCILIATION_REQUIRED
 
 
@@ -275,9 +254,7 @@ async def test_new_document_reservation_creates_first_attempt(
     dataset_repository.get_by_id = AsyncMock(return_value=MagicMock())
 
     document_repository = MagicMock()
-    document_repository.get_by_dataset_and_sha256 = AsyncMock(
-        return_value=None
-    )
+    document_repository.get_by_dataset_and_sha256 = AsyncMock(return_value=None)
 
     upload_attempt_repository = MagicMock()
 

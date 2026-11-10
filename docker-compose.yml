@@ -168,6 +168,47 @@ services:
       start_period: 10s
 
 
+  # Creates the dedicated database and database user for Keycloak.
+  keycloak-db-provisioner:
+    image: postgres:17-alpine
+    entrypoint: [ "/bin/sh", "/scripts/provision-keycloak-db.sh" ]
+    restart: "no"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      KEYCLOAK_DB_NAME: ${KEYCLOAK_DB_NAME}
+      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./infrastructure/scripts/provision-keycloak-db.sh:/scripts/provision-keycloak-db.sh:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Keycloak identity and access management server.
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.2
+    command: [ "start-dev" ]
+    restart: unless-stopped
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB_NAME}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak-db-provisioner:
+        condition: service_completed_successfully
+
+
 
 volumes:
   minio_data:

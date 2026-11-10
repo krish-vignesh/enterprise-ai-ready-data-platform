@@ -1,4 +1,3 @@
-
 """Middleware for generating and propagating request IDs."""
 
 from uuid import uuid4
@@ -34,9 +33,7 @@ class RequestIDMiddleware:
                     if name.lower() != b"x-request-id"
                 ]
 
-                headers.append(
-                    (b"x-request-id", request_id.encode("ascii"))
-                )
+                headers.append((b"x-request-id", request_id.encode("ascii")))
 
                 message["headers"] = headers
 

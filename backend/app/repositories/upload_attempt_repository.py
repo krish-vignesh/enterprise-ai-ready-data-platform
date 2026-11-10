@@ -22,10 +22,10 @@ class UploadAttemptRepository:
         self.session = session
 
     async def get_by_id(
-            self,
-            upload_attempt_id: UUID,
-            *,
-            for_update: bool = False,
+        self,
+        upload_attempt_id: UUID,
+        *,
+        for_update: bool = False,
     ) -> UploadAttempt | None:
         """Get an upload attempt by ID, optionally locking its database row."""
         if for_update:
@@ -33,7 +33,7 @@ class UploadAttemptRepository:
                 UploadAttempt,
                 upload_attempt_id,
                 with_for_update=True,
-                populate_existing=True
+                populate_existing=True,
             )
 
         return await self.session.get(UploadAttempt, upload_attempt_id)
