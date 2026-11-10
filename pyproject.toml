@@ -45,6 +45,7 @@ backend = [
     "loguru>=0.7.3",
     "psycopg[binary]>=3.2,<4.0",
     "pyarrow>=24.0.0",
+    "pyjwt[crypto]>=2.15.1",
     "pypdf>=6.19.0",
     "pyspark==4.2.0",
     "python-docx>=1.2.0",

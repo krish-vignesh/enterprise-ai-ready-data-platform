@@ -24,6 +24,22 @@ class Settings(BaseSettings):
 
     database_url: str
 
+    # Keycloak identity provider configuration
+    keycloak_issuer: str
+    keycloak_jwks_url: str
+    keycloak_api_audience: str
+
+    # JWT signing-key cache configuration
+    jwt_jwks_cache_ttl_seconds: int = Field(
+        default=300,
+        gt=0,
+    )
+
+    jwt_unknown_kid_refresh_interval_seconds: int = Field(
+        default=30,
+        gt=0,
+    )
+
     max_upload_file_size_bytes: int = Field(
         default=50 * 1024 * 1024,
         gt=0,
