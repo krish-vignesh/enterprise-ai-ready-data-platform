@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI
 
+from app.lifespan import lifespan
 from app.api.document_batch import router as document_batch_router
 from app.api.documents import router as documents_router
 from app.api.ingest import router as ingest_router
@@ -9,7 +10,7 @@ from app.config.settings import settings
 from app.middleware.request_id import RequestIDMiddleware
 
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(RequestIDMiddleware)
 
