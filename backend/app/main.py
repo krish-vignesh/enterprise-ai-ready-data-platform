@@ -1,8 +1,10 @@
+
 """Application entry point."""
 
 from fastapi import FastAPI
 
 from app.lifespan import lifespan
+from app.api.companies import router as companies_router
 from app.api.document_batch import router as document_batch_router
 from app.api.documents import router as documents_router
 from app.api.ingest import router as ingest_router
@@ -13,6 +15,9 @@ from app.middleware.request_id import RequestIDMiddleware
 app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(RequestIDMiddleware)
+
+# Company registration APIs.
+app.include_router(companies_router)
 
 # Single and batch document upload APIs.
 app.include_router(documents_router)

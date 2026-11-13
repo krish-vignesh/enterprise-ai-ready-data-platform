@@ -3,20 +3,13 @@
 from __future__ import annotations
 
 import asyncio
-import os
-from urllib.parse import quote
 from uuid import uuid4
 
 import pytest
 from sqlalchemy import text
+from sqlalchemy.engine import URL, make_url
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
-os.environ["DATABASE_URL"] = (
-    "postgresql+psycopg://"
-    f"AURORA:{quote('Suvi@123456789', safe='')}@127.0.0.1:5433/"
-    "enterprise_ai_platform_test"
-)
 
 from app.config.settings import settings
 from app.db.base import Base
@@ -35,11 +28,50 @@ from app.repositories.storage_object_repository import StorageObjectRepository
 from app.repositories.upload_attempt_repository import UploadAttemptRepository
 
 
-if not settings.database_url.endswith("/enterprise_ai_platform_test"):
-    raise RuntimeError(
-        "Integration tests must target enterprise_ai_platform_test; "
-        f"got {settings.database_url!r}"
-    )
+def _validate_test_database_url(test_database_url: str | None) -> URL:
+    """Validate that the dedicated integration-test PostgreSQL URL is safe to use."""
+    if test_database_url is None or not test_database_url.strip():
+        raise RuntimeError(
+            "TEST_DATABASE_URL is required for PostgreSQL integration tests."
+        )
+
+    url = make_url(test_database_url)
+
+    if url.get_backend_name() != "postgresql":
+        raise RuntimeError(
+            "TEST_DATABASE_URL must use the PostgreSQL driver for integration tests."
+        )
+
+    if url.drivername != "postgresql+psycopg":
+        raise RuntimeError(
+            "TEST_DATABASE_URL must use the psycopg PostgreSQL driver for integration tests."
+        )
+
+    if url.database != "enterprise_ai_platform_test_clean":
+        raise RuntimeError(
+            "TEST_DATABASE_URL must target the dedicated enterprise_ai_platform_test_clean database."
+        )
+
+    if url.host != "127.0.0.1":
+        raise RuntimeError(
+            "TEST_DATABASE_URL host must be the dedicated local PostgreSQL host for integration tests."
+        )
+
+    if url.port != 5433:
+        raise RuntimeError(
+            "TEST_DATABASE_URL port must match the dedicated local PostgreSQL port for integration tests."
+        )
+
+    username = url.username
+    if username in {None, "", "postgres", "postgresql", "admin", "root"}:
+        raise RuntimeError(
+            "TEST_DATABASE_URL must use the dedicated PostgreSQL test role for integration tests."
+        )
+
+    return url
+
+
+TEST_DATABASE_URL = _validate_test_database_url(settings.test_database_url)
 
 
 def run_async(coro):
@@ -48,7 +80,7 @@ def run_async(coro):
 
 
 async def _new_session():
-    engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+    engine = create_async_engine(TEST_DATABASE_URL, pool_pre_ping=True)
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
@@ -70,7 +102,7 @@ async def _new_session():
 
 def test_repositories_persist_and_join_data():
     async def run_test() -> None:
-        engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+        engine = create_async_engine(TEST_DATABASE_URL, pool_pre_ping=True)
         try:
             async with engine.begin() as connection:
                 await connection.run_sync(Base.metadata.drop_all)
@@ -218,7 +250,7 @@ def test_repositories_persist_and_join_data():
 
 def test_database_enforces_constraints():
     async def run_test() -> None:
-        engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+        engine = create_async_engine(TEST_DATABASE_URL, pool_pre_ping=True)
         try:
             async with engine.begin() as connection:
                 await connection.run_sync(Base.metadata.drop_all)
@@ -388,7 +420,7 @@ def test_database_enforces_constraints():
 
 def test_repository_add_is_not_committed_and_rollback_removes_rows():
     async def run_test() -> None:
-        engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+        engine = create_async_engine(TEST_DATABASE_URL, pool_pre_ping=True)
         try:
             async with engine.begin() as connection:
                 await connection.run_sync(Base.metadata.drop_all)

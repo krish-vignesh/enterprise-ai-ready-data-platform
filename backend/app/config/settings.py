@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     workspace_records_bucket: str
 
     database_url: str
+    test_database_url: str | None = Field(
+        default=None,
+        alias="TEST_DATABASE_URL",
+    )
 
     # Keycloak identity provider configuration
     keycloak_issuer: str

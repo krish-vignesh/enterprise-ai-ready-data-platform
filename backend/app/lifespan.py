@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
             issuer=settings.keycloak_issuer,
             jwks_url=settings.keycloak_jwks_url,
             audience=settings.keycloak_api_audience,
-            jwks_cache_ttl_seconds=settings.jwt_jwks_cache_ttl_seconds,
+            cache_ttl_seconds=settings.jwt_jwks_cache_ttl_seconds,
             unknown_kid_refresh_interval_seconds=(
                 settings.jwt_unknown_kid_refresh_interval_seconds
             ),
