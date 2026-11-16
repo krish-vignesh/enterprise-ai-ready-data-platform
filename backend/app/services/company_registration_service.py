@@ -1,4 +1,3 @@
-
 """Orchestrate company registration and initial owner membership."""
 
 import logging

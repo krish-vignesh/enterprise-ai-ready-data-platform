@@ -62,7 +62,9 @@ def test_successful_company_registration(test_app, authenticated_user):
     service = MagicMock()
     service.register_company = AsyncMock(return_value=company)
 
-    with patch("app.api.companies.CompanyRegistrationService", return_value=service) as service_class:
+    with patch(
+        "app.api.companies.CompanyRegistrationService", return_value=service
+    ) as service_class:
         with TestClient(test_app) as client:
             response = client.post(
                 "/api/v1/companies",
@@ -82,7 +84,9 @@ def test_successful_company_registration(test_app, authenticated_user):
     )
 
 
-def test_service_receives_internal_user_id_not_keycloak_subject(test_app, authenticated_user):
+def test_service_receives_internal_user_id_not_keycloak_subject(
+    test_app, authenticated_user
+):
     """The endpoint must pass the internal UUID to the service, not the external subject."""
     company_id = uuid4()
     company = SimpleNamespace(
@@ -106,7 +110,9 @@ def test_service_receives_internal_user_id_not_keycloak_subject(test_app, authen
     assert called_kwargs["user_id"] != authenticated_user.keycloak_subject
 
 
-def test_company_name_whitespace_is_normalized_before_service_call(test_app, authenticated_user):
+def test_company_name_whitespace_is_normalized_before_service_call(
+    test_app, authenticated_user
+):
     """The schema should trim company names before validation and service invocation."""
     company_id = uuid4()
     company = SimpleNamespace(

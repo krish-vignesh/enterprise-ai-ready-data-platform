@@ -1,4 +1,3 @@
-
 """API routes for company registration."""
 
 from fastapi import APIRouter, Depends

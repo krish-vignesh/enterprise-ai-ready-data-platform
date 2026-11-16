@@ -1,4 +1,3 @@
-
 """Unit tests for CompanyRegistrationService using a mocked AsyncSession."""
 
 from unittest.mock import AsyncMock, MagicMock
@@ -99,9 +98,7 @@ async def test_register_company_creates_company_and_owner_membership(
     company_repository,
     membership_repository,
 ):
-    session.flush.side_effect = assign_company_id_on_flush(
-        company_repository
-    )
+    session.flush.side_effect = assign_company_id_on_flush(company_repository)
 
     user_id = uuid4()
 

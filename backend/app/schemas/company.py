@@ -1,4 +1,3 @@
-
 """Pydantic schemas for company registration requests and responses."""
 
 from uuid import UUID
