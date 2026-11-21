@@ -104,3 +104,62 @@ def test_add_stages_dataset_without_committing(session, repository):
     session.add.assert_called_once_with(dataset)
     session.commit.assert_not_called()
     assert result is dataset
+
+@pytest.mark.asyncio
+async def test_list_by_company_with_document_counts(
+    session,
+    repository,
+):
+    company_id = uuid4()
+
+    expected_dataset = MagicMock(spec=Dataset)
+
+    expected_rows = [
+        (expected_dataset, 10, 8),
+    ]
+
+    query_result = MagicMock()
+    query_result.all.return_value = expected_rows
+    session.execute.return_value = query_result
+
+    result = await repository.list_by_company_with_document_counts(
+        company_id,
+        limit=10,
+        offset=0,
+    )
+
+    session.execute.assert_awaited_once()
+
+    assert result == expected_rows
+    assert result[0][0] is expected_dataset
+    assert result[0][1] == 10
+    assert result[0][2] == 8
+
+
+@pytest.mark.asyncio
+async def test_list_by_company_with_document_counts_rejects_zero_limit(
+    repository,
+):
+    with pytest.raises(
+        ValueError,
+        match="limit must be greater than zero",
+    ):
+        await repository.list_by_company_with_document_counts(
+            uuid4(),
+            limit=0,
+        )
+
+
+@pytest.mark.asyncio
+async def test_list_by_company_with_document_counts_rejects_negative_offset(
+    repository,
+):
+    with pytest.raises(
+        ValueError,
+        match="offset cannot be negative",
+    ):
+        await repository.list_by_company_with_document_counts(
+            uuid4(),
+            limit=10,
+            offset=-1,
+        )

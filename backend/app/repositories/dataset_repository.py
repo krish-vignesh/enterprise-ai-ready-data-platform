@@ -3,10 +3,14 @@
 import logging
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.dataset import Dataset
+from app.models.document import Document
+from app.models.enums import DocumentStatus
+from app.models.source_system import SourceSystem
+
 
 
 logger = logging.getLogger(__name__)
@@ -116,6 +120,72 @@ class DatasetRepository:
                 source_id,
             )
             raise
+
+
+    async def list_by_company_with_document_counts(
+        self,
+        company_id: UUID,
+        *,
+        limit: int,
+        offset: int = 0,
+    ) -> list[tuple[Dataset, int, int]]:
+        """Return company datasets with total and available document counts."""
+
+        if limit < 1:
+            raise ValueError("limit must be greater than zero")
+
+        if offset < 0:
+            raise ValueError("offset cannot be negative")
+
+        statement = (
+            select(
+                Dataset,
+                func.count(Document.document_id).label("document_count"),
+                func.count(Document.document_id)
+                .filter(Document.status == DocumentStatus.AVAILABLE)
+                .label("available_document_count"),
+            )
+            .join(
+                SourceSystem,
+                Dataset.source_id == SourceSystem.source_id,
+            )
+            .outerjoin(
+                Document,
+                Dataset.dataset_id == Document.dataset_id,
+            )
+            .where(SourceSystem.company_id == company_id)
+            .group_by(Dataset.dataset_id)
+            .order_by(Dataset.created_at, Dataset.dataset_id)
+            .limit(limit)
+            .offset(offset)
+        )
+
+        try:
+            result = await self.session.execute(statement)
+            rows = list(result.all())
+
+            logger.debug(
+                "repository.dataset.list_by_company_with_document_counts "
+                "completed company_id=%s limit=%s offset=%s result_count=%s",
+                company_id,
+                limit,
+                offset,
+                len(rows),
+            )
+
+            return [
+                (dataset, document_count, available_document_count)
+                for dataset, document_count, available_document_count in rows
+            ]
+
+        except Exception:
+            logger.exception(
+                "repository.dataset.list_by_company_with_document_counts "
+                "failed company_id=%s",
+                company_id,
+            )
+            raise
+
 
     def add(self, dataset: Dataset) -> Dataset:
         """Stage a dataset for persistence without committing."""

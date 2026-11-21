@@ -12,6 +12,7 @@ from app.api.source_systems import router as source_systems_router
 from app.config.settings import settings
 from app.middleware.request_id import RequestIDMiddleware
 from app.lifespan import lifespan
+from app.api.datasets import router as datasets_router
 
 
 app = FastAPI(lifespan=lifespan)
@@ -32,5 +33,8 @@ app.include_router(document_batch_router)
 
 # Legacy ingestion routes retained temporarily.
 app.include_router(ingest_router)
+
+# Dataset catalog APIs.
+app.include_router(datasets_router)
 
 print(settings.app_name)

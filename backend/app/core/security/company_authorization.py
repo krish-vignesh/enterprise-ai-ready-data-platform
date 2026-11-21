@@ -11,16 +11,17 @@ from app.core.security.company_permissions import (
     CompanyPermission,
     role_has_permission,
 )
-
-from app.services.source_system_service import SourceSystemService
 from app.core.security.current_user import get_current_user
 from app.db.dependencies import get_db
 from app.models.company_membership import CompanyMembership
+from app.models.dataset import Dataset
 from app.models.source_system import SourceSystem
 from app.models.user import User
 from app.repositories.company_membership_repository import (
     CompanyMembershipRepository,
 )
+from app.repositories.dataset_repository import DatasetRepository
+from app.services.source_system_service import SourceSystemService
 
 
 def require_company_permission(
@@ -105,3 +106,105 @@ def require_source_system_permission(permission: CompanyPermission):
         return source
 
     return permission_dependency
+
+
+
+def require_dataset_permission(
+    permission: CompanyPermission,
+) -> Callable[..., Awaitable[Dataset]]:
+    """
+    Create a FastAPI authorization dependency for Dataset resources.
+
+    DATASET AUTHORIZATION ADDITION
+    ------------------------------
+    Purpose:
+        Protect API operations that identify a resource using dataset_id
+        rather than company_id or source_id.
+
+    Ownership resolution:
+        Dataset -> SourceSystem -> Company -> CompanyMembership
+
+    Authorization process:
+        1. Retrieve the requested Dataset.
+        2. Resolve its owning SourceSystem and Company.
+        3. Retrieve the authenticated user's company membership.
+        4. Verify the requested CompanyPermission using the existing
+           company role-permission policy.
+        5. Return the authorized Dataset.
+
+    Security behaviour:
+        - Missing Dataset: HTTP 404.
+        - Missing parent SourceSystem: HTTP 404.
+        - User without company membership: HTTP 404.
+        - Company member without the required permission: HTTP 403.
+        - Authorized member: return the resolved Dataset.
+
+    This dependency reuses the existing company-level authorization
+    infrastructure. It does not introduce Dataset-specific roles,
+    permissions, or membership records.
+
+    Intended endpoints:
+        - GET /api/v1/datasets/{dataset_id}
+        - GET /api/v1/datasets/{dataset_id}/documents
+    """
+
+    async def dataset_permission_dependency(
+        dataset_id: UUID,
+        current_user: Annotated[
+            User,
+            Depends(get_current_user),
+        ],
+        session: Annotated[
+            AsyncSession,
+            Depends(get_db),
+        ],
+    ) -> Dataset:
+        """
+        Resolve Dataset ownership and authorize the current user.
+
+        The resolved Dataset is returned so the endpoint can reuse it
+        without performing another Dataset lookup.
+        """
+
+        dataset_repository = DatasetRepository(session)
+
+        dataset = await dataset_repository.get_by_id(dataset_id)
+
+        if dataset is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Dataset not found.",
+            )
+
+        source_service = SourceSystemService(session)
+
+        source = await source_service.get_source_system(dataset.source_id)
+
+        if source is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Dataset not found.",
+            )
+
+        membership_repository = CompanyMembershipRepository(session)
+
+        membership = await membership_repository.get_by_user_and_company(
+            user_id=current_user.user_id,
+            company_id=source.company_id,
+        )
+
+        if membership is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Dataset not found.",
+            )
+
+        if not role_has_permission(membership.role, permission):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this resource.",
+            )
+
+        return dataset
+
+    return dataset_permission_dependency
